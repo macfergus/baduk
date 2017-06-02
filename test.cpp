@@ -19,7 +19,7 @@ void print_board(baduk::Board const& board) {
 
 int main() {
         baduk::Board board(19, 19);
-        board.place(baduk::Point(3, 4), baduk::Stone::black);
+        board.place("E4", baduk::Stone::black);
         board.place(baduk::Point(4, 4), baduk::Stone::white);
         board.place(baduk::Point(4, 3), baduk::Stone::black);
         board.place(baduk::Point(4, 5), baduk::Stone::white);

@@ -2,6 +2,20 @@
 
 namespace baduk {
 
+// I is excluded on purpose
+const std::string COLS = "ABCDEFGHJKLMNOPQRSTUVWXYZ";
+
+Point::Point(std::string const& name) {
+    const auto col_s = name.substr(0, 1);
+    const auto row_s = name.substr(1);
+    col_ = COLS.find(col_s);
+    row_ = std::stoi(row_s) - 1;
+}
+
+std::string Point::name() const {
+    return COLS.substr(col_, 1) + std::to_string(row_ + 1);
+}
+
 Board::Board(unsigned int num_rows, unsigned int num_cols) :
         num_rows_(num_rows),
         num_cols_(num_cols),

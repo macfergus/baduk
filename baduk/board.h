@@ -2,6 +2,7 @@
 #define incl_BADUK_BOARD_H__
 
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace baduk {
@@ -13,6 +14,12 @@ public:
     Point(unsigned int r, unsigned int c) :
         row_(r),
         col_(c) {}
+    /** Construct from D4 style coordinates. */
+    Point(std::string const& name);
+    Point(char const* name) : Point(std::string(name)) {}
+
+    /** Format as D4 style coordinates. */
+    std::string name() const;
 
     unsigned int row() const { return row_; }
     unsigned int col() const { return col_; }
