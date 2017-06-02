@@ -1,2 +1,4 @@
 *.swp
 deps/*.d
+out/testrunner
+tests/tests.cpp
