@@ -7,7 +7,7 @@ CXXFLAGS=-std=c++1y -g $(PEDANTIC_CFLAGS)
 SRCS := $(shell find . -name '*.cpp')
 OBJS := ${SRCS:.cpp=.o}
 
-BIN=test
+BIN=demo
 
 .PHONY: all
 all: $(BIN)
