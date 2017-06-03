@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "baduk/baduk.h"
+#include "../baduk/baduk.h"
 
 void print_board(baduk::Board const& board) {
     for (int r = board.numRows() - 1; r >= 0; --r) {
