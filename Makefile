@@ -1,9 +1,9 @@
 DEPDIR=deps
 
-CXX=g++
+CXX=g++-7
 PEDANTIC_CFLAGS=-Wall -Wextra -Wold-style-cast -Werror -pedantic
-CXXFLAGS=-std=c++1y -g $(PEDANTIC_CFLAGS)
-TEST_CXXFLAGS=-std=c++1y -Werror -I/usr/local/include
+CXXFLAGS=-std=c++1z -g $(PEDANTIC_CFLAGS)
+TEST_CXXFLAGS=-std=c++1z -Werror -I/usr/local/include
 
 SRCS := $(shell find baduk -name '*.cpp')
 APP_SRCS := $(shell find apps -name '*.cpp')
@@ -14,13 +14,21 @@ APPS := apps/demo
 .PHONY: all
 all: $(APPS)
 
+.PHONY: clean
+clean:
+	find baduk/ -name \*.o -delete
+	find tests/ -name \*.o -delete
+	rm -f tests/tests.cpp
+	rm -f $(APPS)
+	rm -f out/testrunner
+
 -include $(DEPDIR)/*.d
 
 .PHONY: test
 test: out/testrunner
 	out/testrunner
 
-out/testrunner: tests/tests.cpp
+out/testrunner: tests/tests.cpp $(OBJS)
 	$(CXX) $(TEST_CXXFLAGS) -o out/testrunner tests/tests.cpp $(OBJS)
 
 tests/tests.cpp: tests/*.h

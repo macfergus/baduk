@@ -2,12 +2,15 @@
 #define incl_BADUK_BOARD_H__
 
 #include <memory>
+#include <ostream>
 #include <string>
 #include <vector>
 
 namespace baduk {
 
 enum class Stone { black, white };
+
+Stone other(Stone stone);
 
 class Point {
 public:
@@ -41,11 +44,12 @@ public:
         liberties_(liberties) {}
 
     Stone color() const { return color_; }
-    auto numLiberties() { return liberties_.size(); }
+    auto numLiberties() const { return liberties_.size(); }
     std::vector<Point> stones() const { return stones_; }
 
     void merge(GoString const& other);
     void removeLiberty(Point p);
+    void addLiberty(Point p);
 
 private:
     Stone color_;
@@ -56,6 +60,9 @@ private:
 class Board {
 public:
     Board(unsigned int num_rows, unsigned int num_cols);
+    Board(Board const& b);
+
+    Board& operator=(Board const &b);
 
     unsigned int numRows() const { return num_rows_; }
     unsigned int numCols() const { return num_cols_; }
@@ -63,6 +70,9 @@ public:
     void place(Point point, Stone stone);
     bool isEmpty(Point point) const;
     Stone at(Point point) const;
+    GoString stringAt(Point point) const;
+
+    bool operator==(Board const& b) const;
 
 private:
     unsigned int num_rows_;
@@ -75,6 +85,8 @@ private:
     void replace(std::shared_ptr<GoString> const& new_string);
     void remove(GoString const* old_string);
 };
+
+std::ostream& operator<<(std::ostream&, Board const&);
 
 }
 
