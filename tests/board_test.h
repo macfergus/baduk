@@ -26,30 +26,13 @@ public:
         board1.place("B2", baduk::Stone::black);
 
         baduk::Board board2(board1);
-        //board2.place("B1", baduk::Stone::white);
-
-        std::cout << "ONE ";
-        for (auto p : board1.grid_) {
-            std::cout << p << " ";
-        }
-        std::cout << "\nTWO ";
-        for (auto p : board2.grid_) {
-            std::cout << p << " ";
-        }
-        std::cout << "\n";
+        board2.place("B1", baduk::Stone::white);
 
         const auto string1 = board1.stringAt("A2");
         const auto string2 = board2.stringAt("A2");
-        for (auto stone1 : string1.liberties()) {
-            std::cout << stone1.name() << " ";
-        }
-        std::cout << "\n";
-        for (auto stone2 : string2.liberties()) {
-            std::cout << stone2.name() << " ";
-        }
-        std::cout << "\n";
 
-        //TS_ASSERT_DIFFERS(string1, string2);
+        TS_ASSERT_EQUALS(4, string1.numLiberties());
+        TS_ASSERT_EQUALS(3, string2.numLiberties());
     }
 
     void testCaptureIsNotSuicide() {
