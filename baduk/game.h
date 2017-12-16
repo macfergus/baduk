@@ -23,6 +23,8 @@ class Pass {};
 class Resign {};
 
 using Move = std::variant<Play, Pass, Resign>;
+bool isPass(Move const& move);
+bool isResign(Move const& move);
 
 class GameState {
 public:
@@ -33,7 +35,8 @@ public:
 class Game {
 public:
     virtual void applyMove(Move const& move) = 0;
-    virtual bool isPlayLegal(Play const& play) = 0;
+    virtual bool isPlayLegal(Play const& play) const = 0;
+    virtual bool isOver() const = 0;
     virtual GameState const* currentState() const = 0;
 };
 

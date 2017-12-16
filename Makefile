@@ -2,14 +2,15 @@ DEPDIR=deps
 
 CXX=g++-7
 PEDANTIC_CFLAGS=-Wall -Wextra -Wold-style-cast -Werror -pedantic
-CXXFLAGS=-std=c++1z -g $(PEDANTIC_CFLAGS)
+CXXFLAGS=-O3 -std=c++1z -g $(PEDANTIC_CFLAGS)
 TEST_CXXFLAGS=-std=c++1z -Werror -I/usr/local/include
+LDFLAGS=
 
 SRCS := $(shell find baduk -name '*.cpp')
 APP_SRCS := $(shell find apps -name '*.cpp')
 OBJS := ${SRCS:.cpp=.o}
 APP_OBJS := ${APP_SRCS:.cpp=.o}
-APPS := apps/demo
+APPS := apps/randomplay
 
 .PHONY: all
 all: $(APPS)
@@ -37,5 +38,5 @@ tests/tests.cpp: tests/*.h
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -MMD -c $< -o $@ -MT $@ -MF $(DEPDIR)/$(subst /,__,$@).d
 
-apps/demo: $(OBJS) $(APP_OBJS)
-	$(CXX) $(LDFLAGS) -o apps/demo $(OBJS) apps/demo.o
+apps/randomplay: $(OBJS) $(APP_OBJS)
+	$(CXX) $(LDFLAGS) -o apps/randomplay $(OBJS) apps/randomplay.o

@@ -19,6 +19,39 @@ public:
         TS_ASSERT_EQUALS(board1, board2);
     }
 
+    void testCopy() {
+        baduk::Board board1(19, 19);
+        board1.place("A1", baduk::Stone::black);
+        board1.place("A2", baduk::Stone::black);
+        board1.place("B2", baduk::Stone::black);
+
+        baduk::Board board2(board1);
+        //board2.place("B1", baduk::Stone::white);
+
+        std::cout << "ONE ";
+        for (auto p : board1.grid_) {
+            std::cout << p << " ";
+        }
+        std::cout << "\nTWO ";
+        for (auto p : board2.grid_) {
+            std::cout << p << " ";
+        }
+        std::cout << "\n";
+
+        const auto string1 = board1.stringAt("A2");
+        const auto string2 = board2.stringAt("A2");
+        for (auto stone1 : string1.liberties()) {
+            std::cout << stone1.name() << " ";
+        }
+        std::cout << "\n";
+        for (auto stone2 : string2.liberties()) {
+            std::cout << stone2.name() << " ";
+        }
+        std::cout << "\n";
+
+        //TS_ASSERT_DIFFERS(string1, string2);
+    }
+
     void testCaptureIsNotSuicide() {
         baduk::Board board(19, 19);
         board.place("A1", baduk::Stone::black);

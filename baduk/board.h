@@ -11,6 +11,7 @@ namespace baduk {
 enum class Stone { black, white };
 
 Stone other(Stone stone);
+std::ostream& operator<<(std::ostream& out, Stone s);
 
 class Point {
 public:
@@ -43,18 +44,27 @@ public:
         stones_(1, p),
         liberties_(liberties) {}
 
+    GoString(
+        Stone c,
+        std::vector<Point> const& points,
+        std::vector<Point> const& liberties) :
+        color_(c),
+        stones_(points),
+        liberties_(liberties) {}
+
     Stone color() const { return color_; }
     auto numLiberties() const { return liberties_.size(); }
     std::vector<Point> stones() const { return stones_; }
+    std::vector<Point> liberties() const { return liberties_; }
 
-    void merge(GoString const& other);
-    void removeLiberty(Point p);
-    void addLiberty(Point p);
+    GoString mergedWith(GoString const& other) const;
+    GoString withLiberty(Point p) const;
+    GoString withoutLiberty(Point p) const;
 
-private:
-    Stone color_;
-    std::vector<Point> stones_;
-    std::vector<Point> liberties_;
+public:
+    const Stone color_;
+    const std::vector<Point> stones_;
+    const std::vector<Point> liberties_;
 };
 
 class Board {
@@ -72,18 +82,21 @@ public:
     Stone at(Point point) const;
     GoString stringAt(Point point) const;
 
+    std::vector<Point> neighbors(Point p) const;
+
     bool operator==(Board const& b) const;
 
-private:
+public:
     unsigned int num_rows_;
     unsigned int num_cols_;
 
     std::vector<std::shared_ptr<GoString>> grid_;
 
-    std::vector<Point> neighbors(Point p) const;
     unsigned int index(Point p) const;
-    void replace(std::shared_ptr<GoString> const& new_string);
+    void replace(GoString const& new_string);
     void remove(GoString const* old_string);
+
+    void validate() const;
 };
 
 std::ostream& operator<<(std::ostream&, Board const&);
