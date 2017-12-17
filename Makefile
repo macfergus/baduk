@@ -12,15 +12,17 @@ OBJS := ${SRCS:.cpp=.o}
 APP_OBJS := ${APP_SRCS:.cpp=.o}
 APPS := cppsrc/apps/randomplay cppsrc/apps/demo
 
+TESTDIR = cppsrc/tests
+
 .PHONY: all
 all: $(APPS)
 
 .PHONY: clean
 clean:
 	find cppsrc/baduk/ -name \*.o -delete
-	find cpptests/ -name \*.o -delete
+	find $(TESTDIR) -name \*.o -delete
 	find cppsrc/apps/ -name \*.o -delete
-	rm -f cpptests/tests.cpp
+	rm -f $(TESTDIR)/tests.cpp
 	rm -f out/testrunner
 	rm -f $(APPS)
 
@@ -30,11 +32,11 @@ clean:
 test: out/testrunner
 	out/testrunner
 
-out/testrunner: cpptests/tests.cpp $(OBJS)
-	$(CXX) $(TEST_CXXFLAGS) -o out/testrunner cpptests/tests.cpp $(OBJS)
+out/testrunner: $(TESTDIR)/tests.cpp $(OBJS)
+	$(CXX) $(TEST_CXXFLAGS) -o out/testrunner $(TESTDIR)/tests.cpp $(OBJS)
 
-cpptests/tests.cpp: cpptests/*.h
-	cxxtestgen --error-printer -o cpptests/tests.cpp cpptests/*.h
+$(TESTDIR)/tests.cpp: $(TESTDIR)/*.h
+	cxxtestgen --error-printer -o $(TESTDIR)/tests.cpp $(TESTDIR)/*.h
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -MMD -c $< -o $@ -MT $@ -MF $(DEPDIR)/$(subst /,__,$@).d
