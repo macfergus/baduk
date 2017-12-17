@@ -13,6 +13,7 @@ std::ostream& operator<<(std::ostream& out, Stone s);
 
 class Point {
 public:
+    Point() : row_(1), col_(1) {}
     Point(unsigned int r, unsigned int c) :
         row_(r),
         col_(c) {}

@@ -2,7 +2,7 @@ DEPDIR=deps
 
 CXX=g++-7
 PEDANTIC_CFLAGS=-Wall -Wextra -Wold-style-cast -Werror -pedantic
-CXXFLAGS=-std=c++1z -g $(PEDANTIC_CFLAGS)
+CXXFLAGS=-O3 -std=c++1z -g $(PEDANTIC_CFLAGS)
 TEST_CXXFLAGS=-std=c++1z -Werror -I/usr/local/include
 LDFLAGS=-L/usr/local/Cellar//gperftools/2.6.1/lib/ -lprofiler
 
@@ -19,6 +19,7 @@ all: $(APPS)
 clean:
 	find baduk/ -name \*.o -delete
 	find tests/ -name \*.o -delete
+	rm apps/*.o
 	rm -f tests/tests.cpp
 	rm -f $(APPS)
 	rm -f out/testrunner

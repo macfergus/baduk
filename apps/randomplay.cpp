@@ -8,7 +8,7 @@ int main() {
     baduk::RandomBot white_bot;
 
     while (!game->isOver()) {
-        //std::cout << game->board() << "\n";
+        std::cout << game->board() << "\n";
         auto next_agent =
             game->nextPlayer() == baduk::Stone::black ?
                 &black_bot :
