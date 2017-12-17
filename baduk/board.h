@@ -6,36 +6,10 @@
 #include <string>
 #include <vector>
 
+#include "point.h"
+#include "zobrist/codes.h"
+
 namespace baduk {
-
-enum class Stone { black, white };
-
-Stone other(Stone stone);
-std::ostream& operator<<(std::ostream& out, Stone s);
-
-class Point {
-public:
-    Point(unsigned int r, unsigned int c) :
-        row_(r),
-        col_(c) {}
-    /** Construct from D4 style coordinates. */
-    Point(std::string const& name);
-    Point(char const* name) : Point(std::string(name)) {}
-
-    /** Format as D4 style coordinates. */
-    std::string name() const;
-
-    unsigned int row() const { return row_; }
-    unsigned int col() const { return col_; }
-
-    bool operator==(Point q) const {
-        return row_ == q.row() && col_ == q.col();
-    }
-
-private:
-    unsigned int row_;
-    unsigned int col_;
-};
 
 class GoString {
 public:
@@ -78,6 +52,8 @@ public:
     unsigned int numCols() const { return num_cols_; }
 
     void place(Point point, Stone stone);
+    bool willCapture(Point point, Stone stone) const;
+    bool willHaveNoLiberties(Point point, Stone stone) const;
     bool isEmpty(Point point) const;
     Stone at(Point point) const;
     GoString stringAt(Point point) const;
@@ -86,9 +62,13 @@ public:
 
     bool operator==(Board const& b) const;
 
-public:
+    zobrist::hashcode hash() const;
+
+private:
     unsigned int num_rows_;
     unsigned int num_cols_;
+
+    zobrist::hashcode hashcode_;
 
     std::vector<std::shared_ptr<GoString>> grid_;
 

@@ -2,9 +2,9 @@ DEPDIR=deps
 
 CXX=g++-7
 PEDANTIC_CFLAGS=-Wall -Wextra -Wold-style-cast -Werror -pedantic
-CXXFLAGS=-O3 -std=c++1z -g $(PEDANTIC_CFLAGS)
+CXXFLAGS=-std=c++1z -g $(PEDANTIC_CFLAGS)
 TEST_CXXFLAGS=-std=c++1z -Werror -I/usr/local/include
-LDFLAGS=
+LDFLAGS=-L/usr/local/Cellar//gperftools/2.6.1/lib/ -lprofiler
 
 SRCS := $(shell find baduk -name '*.cpp')
 APP_SRCS := $(shell find apps -name '*.cpp')

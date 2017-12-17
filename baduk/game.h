@@ -5,6 +5,7 @@
 #include <variant>
 
 #include "board.h"
+#include "zobrist/codes.h"
 
 namespace baduk {
 
@@ -30,17 +31,17 @@ class GameState {
 public:
     virtual Board board() const = 0;
     virtual Stone nextPlayer() const = 0;
-};
-
-class Game {
-public:
-    virtual void applyMove(Move const& move) = 0;
-    virtual bool isPlayLegal(Play const& play) const = 0;
+    virtual GameState const* prevState() const = 0;
+    virtual std::shared_ptr<GameState> applyMove(Move const& move) const = 0;
+    virtual bool isMoveLegal(Move const& move) const = 0;
     virtual bool isOver() const = 0;
-    virtual GameState const* currentState() const = 0;
+
+    virtual bool operator==(GameState const&) const = 0;
+
+    virtual zobrist::hashcode hash() const = 0;
 };
 
-std::unique_ptr<Game> newGame(unsigned int board_size);
+std::shared_ptr<const GameState> newGame(unsigned int board_size);
 
 }
 

@@ -6,43 +6,20 @@
 
 namespace baduk {
 
-Stone other(Stone stone) {
-    if (stone == Stone::black) {
-        return Stone::white;
-    }
-    return Stone::black;
-}
-
-std::ostream& operator<<(std::ostream& out, Stone stone) {
-    if (stone == Stone::black) {
-        return out << "b";
-    }
-    return out << "w";
-}
-
 // I is excluded on purpose
 const std::string COLS = "ABCDEFGHJKLMNOPQRSTUVWXYZ";
-
-Point::Point(std::string const& name) {
-    const auto col_s = name.substr(0, 1);
-    const auto row_s = name.substr(1);
-    col_ = COLS.find(col_s);
-    row_ = std::stoi(row_s) - 1;
-}
-
-std::string Point::name() const {
-    return COLS.substr(col_, 1) + std::to_string(row_ + 1);
-}
 
 Board::Board(unsigned int num_rows, unsigned int num_cols) :
         num_rows_(num_rows),
         num_cols_(num_cols),
+        hashcode_(zobrist::EMPTY_BOARD),
         grid_(num_rows * num_cols, nullptr) {
 }
 
 Board::Board(Board const& b) :
         num_rows_(b.num_rows_),
         num_cols_(b.num_cols_),
+        hashcode_(b.hashcode_),
         grid_(b.grid_) {
 }
 
@@ -81,6 +58,15 @@ void Board::place(Point point, Stone player) {
             new_string->mergedWith(*same_color_string));
     }
     replace(*new_string);
+
+    // Update hash code.
+    hashcode_ ^= zobrist::EMPTY_HASH_CODE.at(point);
+    if (player == Stone::black) {
+        hashcode_ ^= zobrist::BLACK_HASH_CODE.at(point);
+    } else {
+        hashcode_ ^= zobrist::WHITE_HASH_CODE.at(point);
+    }
+
     for (auto const& other_color_string : adjacent_other_color) {
         auto replacement_string = other_color_string->withoutLiberty(point);
         if (replacement_string.numLiberties() == 0) {
@@ -89,6 +75,40 @@ void Board::place(Point point, Stone player) {
             replace(replacement_string);
         }
     }
+}
+
+bool Board::willCapture(Point point, Stone player) const {
+    for (Point neighbor : neighbors(point)) {
+        GoString* neighbor_string = grid_[index(neighbor)].get();
+        if (neighbor_string == nullptr) {
+            continue;
+        }
+        if (neighbor_string->color() == player) {
+            continue;
+        }
+        if (neighbor_string->numLiberties() == 1) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Board::willHaveNoLiberties(Point point, Stone player) const {
+    // Does NOT check if it is a capture! Call willCapture first.
+    for (Point neighbor : neighbors(point)) {
+        GoString* neighbor_string = grid_[index(neighbor)].get();
+        if (neighbor_string == nullptr) {
+            // This point will be a liberty.
+            return false;
+        } else if (neighbor_string->color() == player) {
+            if (neighbor_string->numLiberties() > 1) {
+                // This string will still have a liberty after placing the
+                // stone.
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 void Board::replace(GoString const& new_string) {
@@ -145,6 +165,14 @@ void Board::remove(GoString const* old_string) {
         for (auto string_to_update : strings_to_update) {
             replace(string_to_update->withLiberty(point));
         }
+
+        if (old_string->color() == Stone::black) {
+            hashcode_ ^= zobrist::BLACK_HASH_CODE.at(point);
+        } else {
+            hashcode_ ^= zobrist::WHITE_HASH_CODE.at(point);
+        }
+        hashcode_ ^= zobrist::EMPTY_HASH_CODE.at(point);
+
         grid_[index(point)] = nullptr;
     }
 }
@@ -182,6 +210,10 @@ bool Board::operator==(Board const& b) const {
         }
     }
     return true;
+}
+
+zobrist::hashcode Board::hash() const {
+    return hashcode_;
 }
 
 std::ostream& operator<<(std::ostream& out, Board const& board) {

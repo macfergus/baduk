@@ -60,4 +60,50 @@ public:
         const auto string = board.stringAt("P16");
         TS_ASSERT_EQUALS(1, string.numLiberties());
     }
+
+    void testWillCapture() {
+        baduk::Board board(19, 19);
+        board.place("A1", baduk::Stone::black);
+        board.place("B2", baduk::Stone::black);
+        board.place("C1", baduk::Stone::black);
+        board.place("A2", baduk::Stone::white);
+        TS_ASSERT(board.willCapture("B1", baduk::Stone::white));
+    }
+
+    void testWillHaveNoLiberties() {
+        // ooo.
+        // x*xo
+        baduk::Board board(19, 19);
+        board.place("A1", baduk::Stone::black);
+        board.place("A3", baduk::Stone::black);
+        board.place("B1", baduk::Stone::white);
+        board.place("B2", baduk::Stone::white);
+        board.place("B3", baduk::Stone::white);
+        board.place("A4", baduk::Stone::white);
+        TS_ASSERT(board.willHaveNoLiberties("A2", baduk::Stone::black));
+    }
+
+    void testWillHaveNoLiberties_newStoneAddsLiberty() {
+        // o.o.
+        // x*xo
+        baduk::Board board(19, 19);
+        board.place("A1", baduk::Stone::black);
+        board.place("A3", baduk::Stone::black);
+        board.place("B1", baduk::Stone::white);
+        board.place("B3", baduk::Stone::white);
+        board.place("A4", baduk::Stone::white);
+        TS_ASSERT(!board.willHaveNoLiberties("A2", baduk::Stone::black));
+    }
+
+    void testWillHaveNoLiberties_connectingStoneHasLiberty() {
+        // ooo.
+        // x*x.
+        baduk::Board board(19, 19);
+        board.place("A1", baduk::Stone::black);
+        board.place("A3", baduk::Stone::black);
+        board.place("B1", baduk::Stone::white);
+        board.place("B2", baduk::Stone::white);
+        board.place("B3", baduk::Stone::white);
+        TS_ASSERT(!board.willHaveNoLiberties("A2", baduk::Stone::black));
+    }
 };
