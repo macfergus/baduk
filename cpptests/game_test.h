@@ -1,6 +1,6 @@
 #include <cxxtest/TestSuite.h>
 
-#include "../baduk/game.h"
+#include "../cppsrc/baduk/game.h"
 
 class GameTestSuite : public CxxTest::TestSuite {
 public:
