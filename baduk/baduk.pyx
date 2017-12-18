@@ -1,7 +1,9 @@
 import collections
 import enum
 
+from cython.operator cimport dereference as deref
 from libcpp cimport bool
+from libcpp.memory cimport shared_ptr
 
 cdef extern from "baduk/baduk.h" namespace "baduk":
     cdef cppclass CPoint "baduk::Point":
@@ -14,6 +16,10 @@ cdef extern from "baduk/baduk.h" namespace "baduk":
     cdef cppclass CStone "baduk::Stone":
         bool operator==(CStone) const
 
+    cdef cppclass CGoString "baduk::GoString":
+        CStone color() const
+        size_t numLiberties() const
+
     cdef cppclass CBoard "baduk::Board":
         CBoard(unsigned int, unsigned int) except +
 
@@ -24,6 +30,7 @@ cdef extern from "baduk/baduk.h" namespace "baduk":
 
         bool isEmpty(CPoint point) const
         CStone at(CPoint) const
+        shared_ptr[CGoString] stringAt(CPoint) const
 
 cdef extern from "baduk/baduk.h" namespace "baduk::Stone":
     cdef CStone CBlackStone "baduk::Stone::black"
@@ -36,6 +43,18 @@ cdef class Point:
     def __cinit__(self, unsigned int row, unsigned int col):
         self.row = row
         self.col = col
+
+cdef class GoString:
+    cdef shared_ptr[CGoString] c_string
+
+    @property
+    def num_liberties(self):
+        return deref(self.c_string).numLiberties()
+
+cdef wrap_gostring(shared_ptr[CGoString] the_string):
+    result = GoString()
+    result.c_string = the_string
+    return result
 
 class Player(enum.Enum):
     black = 1
@@ -79,3 +98,9 @@ cdef class Board:
             return None
         c_player = self.c_board.at(pt)
         return py_player(c_player)
+
+    def get_string(self, point):
+        cdef CPoint pt = c_point(point)
+        if self.c_board.isEmpty(pt):
+            return None
+        return wrap_gostring(self.c_board.stringAt(pt))

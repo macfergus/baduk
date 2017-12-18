@@ -122,8 +122,8 @@ Stone Board::at(Point p) const {
     return grid_[index(p)]->color();
 }
 
-GoString Board::stringAt(Point p) const {
-    return *grid_[index(p)];
+std::shared_ptr<GoString> Board::stringAt(Point p) const {
+    return grid_[index(p)];
 }
 
 std::vector<Point> Board::neighbors(Point p) const {

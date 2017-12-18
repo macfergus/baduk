@@ -56,7 +56,7 @@ public:
     bool willHaveNoLiberties(Point point, Stone stone) const;
     bool isEmpty(Point point) const;
     Stone at(Point point) const;
-    GoString stringAt(Point point) const;
+    std::shared_ptr<GoString> stringAt(Point point) const;
 
     std::vector<Point> neighbors(Point p) const;
 
