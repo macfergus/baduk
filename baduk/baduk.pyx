@@ -1,3 +1,4 @@
+import collections
 import enum
 
 from libcpp cimport bool
@@ -29,21 +30,12 @@ cdef extern from "baduk/baduk.h" namespace "baduk::Stone":
     cdef CStone CWhiteStone "baduk::Stone::white"
 
 cdef class Point:
-    cdef CPoint* c_point
+    cdef unsigned int row
+    cdef unsigned int col
+
     def __cinit__(self, unsigned int row, unsigned int col):
-        self.c_point = new CPoint(row, col)
-
-    def __dealloc__(self):
-        del self.c_point
-
-    @property
-    def row(self):
-        return self.c_point.row()
-
-    @property
-    def col(self):
-        return self.c_point.col()
-
+        self.row = row
+        self.col = col
 
 class Player(enum.Enum):
     black = 1
@@ -68,7 +60,7 @@ cdef py_player(CStone c_player):
     raise ValueError()
 
 cdef CPoint c_point(Point point):
-    return CPoint(point.row, point.col)
+    return CPoint(point.row - 1, point.col - 1)
 
 cdef class Board:
     cdef CBoard* c_board

@@ -6,13 +6,13 @@ setup(
     ext_modules=cythonize(Extension(
         "baduk",
         sources=[
-            "baduk.pyx",
-            "baduk/agent.cpp",
-            "baduk/board.cpp",
-            "baduk/game.cpp",
-            "baduk/point.cpp",
+            "baduk/*.pyx",
+            "cppsrc/baduk/agent.cpp",
+            "cppsrc/baduk/board.cpp",
+            "cppsrc/baduk/game.cpp",
+            "cppsrc/baduk/point.cpp",
         ],
         language="c++",
-        extra_compile_args=['-std=c++1z'],
+        extra_compile_args=['-std=c++1z', '-I./cppsrc'],
     ))
 )
