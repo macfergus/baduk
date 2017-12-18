@@ -11,6 +11,7 @@ namespace baduk {
 
 class Play {
 public:
+    Play() : point_(0, 0) {}
     Play(Point p) : point_(p) {}
 
     Point point() const { return point_; }
