@@ -46,3 +46,11 @@ cppsrc/apps/randomplay: $(OBJS) $(APP_OBJS)
 
 cppsrc/apps/demo: $(OBJS) $(APP_OBJS)
 	$(CXX) $(LDFLAGS) -o cppsrc/apps/demo $(OBJS) cppsrc/apps/demo.o
+
+.PHONY: pymodule
+pymodule:
+	CC=g++-7 CXX=g++-7 python setup.py build_ext --inplace
+
+.PHONY: pytest
+pytest: pymodule
+	nosetests tests/
