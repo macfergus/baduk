@@ -53,6 +53,8 @@ cdef extern from "baduk/baduk.h" namespace "baduk":
     cdef cppclass CGameState "baduk::GameState":
         CBoard board() const
         CStone nextPlayer() const
+        bool isMoveLegal(CMove) const
+        bool isOver() const
 
         shared_ptr[const CGameState] applyMove(CMove) const
 
@@ -201,3 +203,21 @@ cdef class GameState:
     @property
     def board(self):
         return copy_and_wrap_board(deref(self.c_gamestate).board())
+
+    cpdef bool is_over(self):
+        return deref(self.c_gamestate).isOver()
+
+    cpdef bool is_valid_move(self, Move move):
+        return deref(self.c_gamestate).isMoveLegal(c_move(move))
+
+    cpdef legal_moves(self):
+        moves = []
+        for row in range(1, self.board.num_rows + 1):
+            for col in range(1, self.board.num_cols + 1):
+                move = Move.play(Point(row, col))
+                if self.is_valid_move(move):
+                    moves.append(move)
+        # These two moves are always legal.
+        moves.append(Move.pass_turn())
+        moves.append(Move.resign())
+        return moves
