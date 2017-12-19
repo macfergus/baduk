@@ -65,12 +65,18 @@ cdef extern from "baduk/baduk.h" namespace "baduk::Stone":
     cdef CStone CWhiteStone "baduk::Stone::white"
 
 cdef class Point:
-    cdef unsigned int row
-    cdef unsigned int col
+    cdef public unsigned int row
+    cdef public unsigned int col
 
     def __cinit__(self, unsigned int row, unsigned int col):
         self.row = row
         self.col = col
+
+    def __hash__(self):
+        return hash((self.row, self.col))
+
+    def __eq__(self, other):
+        return self.row == other.row and self.col == other.col
 
 cdef class Move:
     cdef public point
@@ -146,6 +152,10 @@ cdef class Board:
     def __cinit__(self, unsigned int num_rows, unsigned int num_cols):
         self.c_board.reset(new CBoard(num_rows, num_cols))
 
+    def is_on_grid(self, point):
+        return 1 <= point.row <= deref(self.c_board).numRows() and \
+            1 <= point.col <= deref(self.c_board).numCols()
+
     def place_stone(self, player, point):
         deref(self.c_board).place(c_point(point), c_player(player))
 
@@ -161,6 +171,14 @@ cdef class Board:
         if deref(self.c_board).isEmpty(pt):
             return None
         return wrap_gostring(deref(self.c_board).stringAt(pt))
+
+    @property
+    def num_rows(self):
+        return deref(self.c_board).numRows()
+
+    @property
+    def num_cols(self):
+        return deref(self.c_board).numCols()
 
 cdef copy_and_wrap_board(CBoard board):
     pyboard = Board(1, 1)
@@ -209,6 +227,15 @@ cdef class GameState:
 
     cpdef bool is_valid_move(self, Move move):
         return deref(self.c_gamestate).isMoveLegal(c_move(move))
+
+    cpdef legal_plays(self):
+        moves = []
+        for row in range(1, self.board.num_rows + 1):
+            for col in range(1, self.board.num_cols + 1):
+                move = Move.play(Point(row, col))
+                if self.is_valid_move(move):
+                    moves.append(move)
+        return moves
 
     cpdef legal_moves(self):
         moves = []
