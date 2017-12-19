@@ -43,6 +43,7 @@ public:
 
 class Board {
 public:
+    Board();
     Board(unsigned int num_rows, unsigned int num_cols);
     Board(Board const& b);
 

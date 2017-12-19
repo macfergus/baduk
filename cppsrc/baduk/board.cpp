@@ -9,6 +9,13 @@ namespace baduk {
 // I is excluded on purpose
 const std::string COLS = "ABCDEFGHJKLMNOPQRSTUVWXYZ";
 
+Board::Board() :
+        num_rows_(19),
+        num_cols_(19),
+        hashcode_(zobrist::EMPTY_BOARD),
+        grid_(19 * 19, nullptr) {
+}
+
 Board::Board(unsigned int num_rows, unsigned int num_cols) :
         num_rows_(num_rows),
         num_cols_(num_cols),
