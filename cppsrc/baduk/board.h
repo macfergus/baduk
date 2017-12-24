@@ -60,7 +60,7 @@ public:
     Stone at(Point point) const;
     std::shared_ptr<GoString> stringAt(Point point) const;
 
-    std::vector<Point> neighbors(Point p) const;
+    std::vector<Point> const& neighbors(Point p) const;
 
     bool operator==(Board const& b) const;
 

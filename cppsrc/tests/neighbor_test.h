@@ -17,7 +17,7 @@ void assertPointsEqual(
 class NeighborTestSuite : public CxxTest::TestSuite {
 public:
     void testNeighborTable() {
-        const auto neighbor_table = baduk::NeighborTable(5);
+        const auto neighbor_table = baduk::NeighborTable(5, 5);
 
         assertPointsEqual(neighbor_table.get("A1"), {"A2", "B1"});
         assertPointsEqual(neighbor_table.get("A3"), {"A2", "A4", "B3"});
@@ -25,10 +25,10 @@ public:
     }
 
     void testGetNeighbors() {
-        const auto table19 = baduk::getNeighborTable(19);
+        const auto table19 = baduk::getNeighborTable(19, 19);
         assertPointsEqual(table19->get("A1"), {"A2", "B1"});
         assertPointsEqual(table19->get("T19"), {"S19", "T18"});
-        const auto table9 = baduk::getNeighborTable(9);
+        const auto table9 = baduk::getNeighborTable(9, 9);
         assertPointsEqual(table9->get("J5"), {"J4", "J6", "H5"});
     }
 };

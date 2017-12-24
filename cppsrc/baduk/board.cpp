@@ -12,7 +12,7 @@ const std::string COLS = "ABCDEFGHJKLMNOPQRSTUVWXYZ";
 Board::Board() :
         num_rows_(19),
         num_cols_(19),
-        neighbors_(getNeighborTable(19)),
+        neighbors_(getNeighborTable(19, 19)),
         hashcode_(zobrist::EMPTY_BOARD),
         grid_(19 * 19, nullptr) {
 }
@@ -20,7 +20,7 @@ Board::Board() :
 Board::Board(unsigned int num_rows, unsigned int num_cols) :
         num_rows_(num_rows),
         num_cols_(num_cols),
-        neighbors_(getNeighborTable(num_rows)),
+        neighbors_(getNeighborTable(num_rows, num_cols)),
         hashcode_(zobrist::EMPTY_BOARD),
         grid_(num_rows * num_cols, nullptr) {
 }
@@ -136,7 +136,7 @@ std::shared_ptr<GoString> Board::stringAt(Point p) const {
     return grid_[index(p)];
 }
 
-std::vector<Point> Board::neighbors(Point p) const {
+std::vector<Point> const& Board::neighbors(Point p) const {
     return neighbors_->get(p);
 }
 

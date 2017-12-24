@@ -1,26 +1,30 @@
+#include <memory>
+
 #include "neighbor.h"
 
 namespace baduk {
 
-NeighborTable::NeighborTable(unsigned int board_size) :
-    neighbors_([board_size]() {
-        std::unordered_map<Point, std::vector<Point>> table;
-        for (unsigned int r = 0; r < board_size; ++r) {
-            for (unsigned int c = 0; c < board_size; ++c) {
+NeighborTable::NeighborTable(unsigned int num_rows, unsigned int num_cols) :
+    num_rows_(num_rows),
+    num_cols_(num_cols),
+    neighbors_([num_rows, num_cols]() {
+        std::vector<std::vector<Point>> table;
+        for (unsigned int r = 0; r < num_rows; ++r) {
+            for (unsigned int c = 0; c < num_cols; ++c) {
                 std::vector<Point> neighbors;
                 if (r > 0) {
                     neighbors.push_back(Point(r - 1, c));
                 }
-                if (r < board_size - 1) {
+                if (r < num_rows - 1) {
                     neighbors.push_back(Point(r + 1, c));
                 }
                 if (c > 0) {
                     neighbors.push_back(Point(r, c - 1));
                 }
-                if (c < board_size - 1) {
+                if (c < num_cols - 1) {
                     neighbors.push_back(Point(r, c + 1));
                 }
-                table.emplace(Point(r, c), neighbors);
+                table.push_back(neighbors);
             }
         }
         return table;
@@ -28,17 +32,23 @@ NeighborTable::NeighborTable(unsigned int board_size) :
 }
 
 std::vector<Point> const& NeighborTable::get(Point const& p) const {
-    return neighbors_.at(p);
+    unsigned int index = num_cols_ * p.row() + p.col();
+    return neighbors_.at(index);
 }
 
-NeighborTable const* getNeighborTable(unsigned int board_size) {
-    static std::unordered_map<unsigned int, NeighborTable> tables;
+NeighborTable const* getNeighborTable(
+        unsigned int num_rows, unsigned int num_cols) {
+    // Max supported board size is 25x25.
+    static std::vector<std::unique_ptr<NeighborTable>> tables(25 * 25 + 1);
 
-    if (tables.find(board_size) == tables.end()) {
-        tables.emplace(board_size, board_size);
+    const auto index = num_rows * 25 + num_cols;
+    NeighborTable const* rv = tables[index].get();
+    if (rv == nullptr) {
+        tables[index] = std::make_unique<NeighborTable>(num_rows, num_cols);
+        rv = tables[index].get();
     }
 
-    return &tables.at(board_size);
+    return rv;
 }
 
 }

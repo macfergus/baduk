@@ -1,7 +1,7 @@
 #ifndef incl_BADUK_NEIGHBOR_H__
 #define incl_BADUK_NEIGHBOR_H__
 
-#include <unordered_map>
+#include <vector>
 
 #include "point.h"
 
@@ -9,15 +9,19 @@ namespace baduk {
 
 class NeighborTable {
 public:
-    NeighborTable(unsigned int board_size);
+    NeighborTable(unsigned int num_rows, unsigned int num_cols);
 
     std::vector<Point> const& get(Point const& p) const;
 
 private:
-    std::unordered_map<Point, std::vector<Point>> neighbors_;
+    unsigned int num_rows_;
+    unsigned int num_cols_;
+    std::vector<std::vector<Point>> neighbors_;
 };
 
-NeighborTable const* getNeighborTable(unsigned int board_size);
+NeighborTable const* getNeighborTable(
+    unsigned int num_rows, unsigned int num_cols);
+
 
 }
 
