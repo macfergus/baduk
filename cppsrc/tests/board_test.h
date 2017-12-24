@@ -106,4 +106,36 @@ public:
         board.place("B3", baduk::Stone::white);
         TS_ASSERT(!board.willHaveNoLiberties("A2", baduk::Stone::black));
     }
+
+    void verifyHash(baduk::Board orig, baduk::Point p, baduk::Stone player) {
+        const auto anticipated_hash = orig.hashAfter(p, player);
+        orig.place(p, player);
+        const auto actual_hash = orig.hash();
+        TS_ASSERT_EQUALS(anticipated_hash, actual_hash);
+    }
+
+    void testHashAfter() {
+        // .....    .....
+        // .....    .....
+        // ..... -> ..x..
+        // .....    .....
+        // .....    .....
+        baduk::Board board(5, 5);
+        verifyHash(board, "C3", baduk::Stone::black);
+        verifyHash(board, "C3", baduk::Stone::white);
+    }
+
+    void testHashAfter_capture() {
+        // .....    .....
+        // ..x..    ..x..
+        // .xo.. -> .x.x.
+        // ..x..    ..x..
+        // .....    .....
+        baduk::Board board(5, 5);
+        board.place("C2", baduk::Stone::black);
+        board.place("B3", baduk::Stone::black);
+        board.place("C4", baduk::Stone::black);
+        board.place("C3", baduk::Stone::white);
+        verifyHash(board, "D3", baduk::Stone::black);
+    }
 };

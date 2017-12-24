@@ -115,9 +115,18 @@ public:
 
             // Ko.
             if (game_state->board_.willCapture(point, player)) {
-                const auto next_state = game_state->applyMove(play);
+                // Find the hash of the next state, without actually computing
+                // the full board position.
+                const auto next_board_hash =
+                    game_state->board_.hashAfter(point, player);
+                const auto next_player_hash =
+                    game_state->next_player_ == Stone::black ?
+                        zobrist::WHITE_TO_PLAY :
+                        zobrist::BLACK_TO_PLAY;
+                const auto next_state_hash = next_board_hash ^ next_player_hash;
+
                 const auto prev_ptr = game_state->previous_states_.find(
-                    next_state->hash());
+                    next_state_hash);
                 if (prev_ptr != game_state->previous_states_.end()) {
                     return false;
                 }

@@ -213,6 +213,38 @@ zobrist::hashcode Board::hash() const {
     return hashcode_;
 }
 
+zobrist::hashcode Board::hashAfter(Point point, Stone stone) const {
+    auto hashcode = hash();
+    const auto my_codes = stone == Stone::black ?
+        &zobrist::BLACK_HASH_CODE :
+        &zobrist::WHITE_HASH_CODE;
+    const auto opponent_codes = stone == Stone::black ?
+        &zobrist::WHITE_HASH_CODE :
+        &zobrist::BLACK_HASH_CODE;
+
+    // Place the new stone.
+    hashcode ^= zobrist::EMPTY_HASH_CODE.at(point);
+    hashcode ^= my_codes->at(point);
+
+    for (Point neighbor : neighbors_->get(point)) {
+        GoString* neighbor_string = grid_[index(neighbor)].get();
+        if (neighbor_string == nullptr) {
+            continue;
+        }
+        if (neighbor_string->color() == stone) {
+            continue;
+        }
+        if (neighbor_string->numLiberties() == 1) {
+            for (const auto& p : neighbor_string->stones()) {
+                hashcode ^= opponent_codes->at(p);
+                hashcode ^= zobrist::EMPTY_HASH_CODE.at(p);
+            }
+        }
+    }
+
+    return hashcode;
+}
+
 std::ostream& operator<<(std::ostream& out, Board const& board) {
     for (int r = board.numRows() - 1; r >= 0; --r) {
         if (r + 1 < 10) {

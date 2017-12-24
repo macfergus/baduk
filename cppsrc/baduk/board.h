@@ -65,6 +65,8 @@ public:
     bool operator==(Board const& b) const;
 
     zobrist::hashcode hash() const;
+    /** Compute what the hash would be, after placing this stone. */
+    zobrist::hashcode hashAfter(Point point, Stone stone) const;
 
 private:
     unsigned int num_rows_;
