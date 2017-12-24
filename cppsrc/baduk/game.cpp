@@ -30,19 +30,27 @@ class GameStateImpl :
     public GameState,
     public std::enable_shared_from_this<GameStateImpl> {
 public:
-    GameStateImpl(
-            Board const& board,
-            Stone next_player,
-            std::optional<Move> last_move,
-            std::shared_ptr<const GameStateImpl> parent) :
+    GameStateImpl(Board const& board, Stone next_player) :
         board_(board),
+        next_player_(next_player) {}
+
+    GameStateImpl(
+            Stone next_player,
+            std::shared_ptr<const GameStateImpl> parent,
+            Move const& last_move) :
+        board_(parent->board_),
         next_player_(next_player),
         last_move_(last_move),
         prev_state_(parent) {
-        if (prev_state_ != nullptr) {
-            previous_states_ = parent->previous_states_;
-            previous_states_.insert(prev_state_->hash());
+
+        if (std::holds_alternative<Play>(last_move)) {
+            board_.place(
+                std::get<Play>(last_move).point(),
+                other(next_player_));
         }
+
+        previous_states_ = parent->previous_states_;
+        previous_states_.insert(prev_state_->hash());
     }
 
     Board board() const override { return board_; }
@@ -61,43 +69,12 @@ public:
         return board_ == other.board_ && next_player_ == other.next_player_;
     }
 
-    struct ProcessMove {
-        std::shared_ptr<const GameStateImpl> game_state;
-
-        ProcessMove(std::shared_ptr<const GameStateImpl> parent) :
-            game_state(parent) {}
-
-        std::shared_ptr<GameStateImpl> operator()(Play const& play) {
-            const auto player = game_state->nextPlayer();
-            Board next_board(game_state->board());
-            next_board.place(play.point(), player);
-
-            return std::make_shared<GameStateImpl>(
-                next_board, other(player), play, game_state
-            );
-        }
-
-        std::shared_ptr<GameStateImpl> operator()(Pass const& pass) {
-            return std::make_shared<GameStateImpl>(
-                game_state->board(),
-                other(game_state->nextPlayer()),
-                pass,
-                game_state
-            );
-        }
-
-        std::shared_ptr<GameStateImpl> operator()(Resign const& resign) {
-            return std::make_shared<GameStateImpl>(
-                game_state->board(),
-                other(game_state->nextPlayer()),
-                resign,
-                game_state
-            );
-        }
-    };
-
     std::shared_ptr<GameState> applyMove(Move const& move) const override {
-        return std::visit(ProcessMove(shared_from_this()), move);
+        return std::make_shared<GameStateImpl>(
+            other(next_player_),
+            shared_from_this(),
+            move
+        );
     }
 
     bool isOver() const override {
@@ -179,9 +156,7 @@ std::shared_ptr<const GameState> newGame(unsigned int board_size) {
     return std::shared_ptr<const GameState>(
         std::make_shared<const GameStateImpl>(
             Board(board_size, board_size),
-            Stone::black,
-            std::nullopt, /* last move */
-            nullptr /* parent */
+            Stone::black
         )
     );
 }
