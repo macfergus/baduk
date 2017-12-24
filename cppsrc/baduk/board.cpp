@@ -12,6 +12,7 @@ const std::string COLS = "ABCDEFGHJKLMNOPQRSTUVWXYZ";
 Board::Board() :
         num_rows_(19),
         num_cols_(19),
+        neighbors_(getNeighborTable(19)),
         hashcode_(zobrist::EMPTY_BOARD),
         grid_(19 * 19, nullptr) {
 }
@@ -19,6 +20,7 @@ Board::Board() :
 Board::Board(unsigned int num_rows, unsigned int num_cols) :
         num_rows_(num_rows),
         num_cols_(num_cols),
+        neighbors_(getNeighborTable(num_rows)),
         hashcode_(zobrist::EMPTY_BOARD),
         grid_(num_rows * num_cols, nullptr) {
 }
@@ -26,6 +28,7 @@ Board::Board(unsigned int num_rows, unsigned int num_cols) :
 Board::Board(Board const& b) :
         num_rows_(b.num_rows_),
         num_cols_(b.num_cols_),
+        neighbors_(b.neighbors_),
         hashcode_(b.hashcode_),
         grid_(b.grid_) {
 }
@@ -45,7 +48,7 @@ void Board::place(Point point, Stone player) {
     std::vector<GoString*> adjacent_same_color;
     std::vector<GoString*> adjacent_other_color;
     std::vector<Point> liberties;
-    for (Point neighbor: neighbors(point)) {
+    for (Point neighbor: neighbors_->get(point)) {
         GoString* neighbor_string = grid_[index(neighbor)].get();
         if (neighbor_string == nullptr) {
             liberties.push_back(neighbor);
@@ -85,7 +88,7 @@ void Board::place(Point point, Stone player) {
 }
 
 bool Board::willCapture(Point point, Stone player) const {
-    for (Point neighbor : neighbors(point)) {
+    for (Point neighbor : neighbors_->get(point)) {
         GoString* neighbor_string = grid_[index(neighbor)].get();
         if (neighbor_string == nullptr) {
             continue;
@@ -102,7 +105,7 @@ bool Board::willCapture(Point point, Stone player) const {
 
 bool Board::willHaveNoLiberties(Point point, Stone player) const {
     // Does NOT check if it is a capture! Call willCapture first.
-    for (Point neighbor : neighbors(point)) {
+    for (Point neighbor : neighbors_->get(point)) {
         GoString* neighbor_string = grid_[index(neighbor)].get();
         if (neighbor_string == nullptr) {
             // This point will be a liberty.
@@ -134,20 +137,7 @@ std::shared_ptr<GoString> Board::stringAt(Point p) const {
 }
 
 std::vector<Point> Board::neighbors(Point p) const {
-    std::vector<Point> rv;
-    if (p.row() > 0) {
-        rv.push_back(Point(p.row() - 1, p.col()));
-    }
-    if (p.row() < num_rows_ - 1) {
-        rv.push_back(Point(p.row() + 1, p.col()));
-    }
-    if (p.col() > 0) {
-        rv.push_back(Point(p.row(), p.col() - 1));
-    }
-    if (p.col() < num_cols_ - 1) {
-        rv.push_back(Point(p.row(), p.col() + 1));
-    }
-    return rv;
+    return neighbors_->get(p);
 }
 
 unsigned int Board::index(Point p) const {
@@ -157,7 +147,7 @@ unsigned int Board::index(Point p) const {
 void Board::remove(GoString const* old_string) {
     for (auto const& point : old_string->stones()) {
         std::vector<GoString const*> strings_to_update;
-        for (Point neighbor : neighbors(point)) {
+        for (Point neighbor : neighbors_->get(point)) {
             auto neighbor_string = grid_[index(neighbor)].get();
             if (neighbor_string == nullptr) {
                 continue;

@@ -10,7 +10,7 @@ SRCS := $(shell find cppsrc/baduk -name '*.cpp')
 APP_SRCS := $(shell find cppsrc/apps -name '*.cpp')
 OBJS := ${SRCS:.cpp=.o}
 APP_OBJS := ${APP_SRCS:.cpp=.o}
-APPS := cppsrc/apps/randomplay cppsrc/apps/demo
+APPS := cppsrc/apps/randomplay cppsrc/apps/demo cppsrc/apps/benchmark
 
 TESTDIR = cppsrc/tests
 
@@ -40,6 +40,9 @@ $(TESTDIR)/tests.cpp: $(TESTDIR)/*.h
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -MMD -c $< -o $@ -MT $@ -MF $(DEPDIR)/$(subst /,__,$@).d
+
+cppsrc/apps/benchmark: $(OBJS) $(APP_OBJS)
+	$(CXX) $(LDFLAGS) -o cppsrc/apps/benchmark $(OBJS) cppsrc/apps/benchmark.o
 
 cppsrc/apps/randomplay: $(OBJS) $(APP_OBJS)
 	$(CXX) $(LDFLAGS) -o cppsrc/apps/randomplay $(OBJS) cppsrc/apps/randomplay.o

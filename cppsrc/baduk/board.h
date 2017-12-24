@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "neighbor.h"
 #include "point.h"
 #include "zobrist/codes.h"
 
@@ -68,6 +69,8 @@ public:
 private:
     unsigned int num_rows_;
     unsigned int num_cols_;
+
+    NeighborTable const* neighbors_;
 
     zobrist::hashcode hashcode_;
 
