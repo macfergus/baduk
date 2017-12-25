@@ -3,7 +3,7 @@
 #include "../baduk/baduk.h"
 
 int main() {
-    for (int i = 0; i < 4000; ++i) {
+    for (int i = 0; i < 10000; ++i) {
         auto game = baduk::newGame(9);
         baduk::RandomBot black_bot;
         baduk::RandomBot white_bot;
@@ -17,7 +17,6 @@ int main() {
 
             game = game->applyMove(next_move);
         }
-        std::cout << game->board() << "\n";
     }
 
     return 0;

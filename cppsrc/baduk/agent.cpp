@@ -59,8 +59,12 @@ bool isPointAnEye(Board const& board, Point const& point, Stone stone) {
 }
 
 Move RandomBot::selectMove(GameState const& game_state) {
-    std::vector<Point> candidates;
+    thread_local static std::vector<Point> candidates;
     auto const board = game_state.board();
+
+    candidates.reserve(board.numRows() * board.numCols());
+    candidates.clear();
+
     for (unsigned int r = 0; r < board.numRows(); ++r) {
         for (unsigned int c = 0; c < board.numCols(); ++c) {
             const Point candidate(r, c);
