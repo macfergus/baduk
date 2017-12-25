@@ -5,7 +5,7 @@
 #include <variant>
 
 #include "board.h"
-#include "zobrist/codes.h"
+#include "zobrist/zobrist.h"
 
 namespace baduk {
 

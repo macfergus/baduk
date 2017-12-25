@@ -25,6 +25,7 @@ clean:
 	rm -f $(TESTDIR)/tests.cpp
 	rm -f out/testrunner
 	rm -f $(APPS)
+	rm -f $(DEPDIR)/*.d
 
 -include $(DEPDIR)/*.d
 

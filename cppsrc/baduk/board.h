@@ -8,7 +8,7 @@
 
 #include "neighbor.h"
 #include "point.h"
-#include "zobrist/codes.h"
+#include "zobrist/zobrist.h"
 
 namespace baduk {
 
@@ -74,6 +74,8 @@ public:
     zobrist::hashcode hashAfter(Point point, Stone stone) const;
 
 private:
+    zobrist::ZobristCodes const& zobrist_;
+
     unsigned int num_rows_;
     unsigned int num_cols_;
 

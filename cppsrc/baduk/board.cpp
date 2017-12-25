@@ -10,22 +10,25 @@ namespace baduk {
 const std::string COLS = "ABCDEFGHJKLMNOPQRSTUVWXYZ";
 
 Board::Board() :
+        zobrist_(zobrist::ZobristCodes::get()),
         num_rows_(19),
         num_cols_(19),
         neighbors_(getNeighborTable(19, 19)),
-        hashcode_(zobrist::EMPTY_BOARD),
+        hashcode_(zobrist_.emptyBoard()),
         grid_(19 * 19, nullptr) {
 }
 
 Board::Board(unsigned int num_rows, unsigned int num_cols) :
+        zobrist_(zobrist::ZobristCodes::get()),
         num_rows_(num_rows),
         num_cols_(num_cols),
         neighbors_(getNeighborTable(num_rows, num_cols)),
-        hashcode_(zobrist::EMPTY_BOARD),
+        hashcode_(zobrist_.emptyBoard()),
         grid_(num_rows * num_cols, nullptr) {
 }
 
 Board::Board(Board const& b) :
+        zobrist_(zobrist::ZobristCodes::get()),
         num_rows_(b.num_rows_),
         num_cols_(b.num_cols_),
         neighbors_(b.neighbors_),
@@ -67,12 +70,8 @@ void Board::place(Point point, Stone player) {
     replace(new_string);
 
     // Update hash code.
-    hashcode_ ^= zobrist::EMPTY_HASH_CODE.at(point);
-    if (player == Stone::black) {
-        hashcode_ ^= zobrist::BLACK_HASH_CODE.at(point);
-    } else {
-        hashcode_ ^= zobrist::WHITE_HASH_CODE.at(point);
-    }
+    hashcode_ ^= zobrist_.getEmpty(point);
+    hashcode_ ^= zobrist_.getStone(player, point);
 
     for (auto const& other_color_string : adjacent_other_color) {
         auto replacement_string = std::make_shared<GoString>(
@@ -162,12 +161,8 @@ void Board::remove(GoString const* old_string) {
             ));
         }
 
-        if (old_string->color() == Stone::black) {
-            hashcode_ ^= zobrist::BLACK_HASH_CODE.at(point);
-        } else {
-            hashcode_ ^= zobrist::WHITE_HASH_CODE.at(point);
-        }
-        hashcode_ ^= zobrist::EMPTY_HASH_CODE.at(point);
+        hashcode_ ^= zobrist_.getStone(old_string->color(), point);
+        hashcode_ ^= zobrist_.getEmpty(point);
 
         grid_[index(point)] = nullptr;
     }
@@ -214,16 +209,11 @@ zobrist::hashcode Board::hash() const {
 
 zobrist::hashcode Board::hashAfter(Point point, Stone stone) const {
     auto hashcode = hash();
-    const auto my_codes = stone == Stone::black ?
-        &zobrist::BLACK_HASH_CODE :
-        &zobrist::WHITE_HASH_CODE;
-    const auto opponent_codes = stone == Stone::black ?
-        &zobrist::WHITE_HASH_CODE :
-        &zobrist::BLACK_HASH_CODE;
+    const auto opponent = other(stone);
 
     // Place the new stone.
-    hashcode ^= zobrist::EMPTY_HASH_CODE.at(point);
-    hashcode ^= my_codes->at(point);
+    hashcode ^= zobrist_.getEmpty(point);
+    hashcode ^= zobrist_.getStone(stone, point);
 
     for (Point neighbor : neighbors_->get(point)) {
         const auto neighbor_string = grid_[index(neighbor)].get();
@@ -235,8 +225,8 @@ zobrist::hashcode Board::hashAfter(Point point, Stone stone) const {
         }
         if (neighbor_string->numLiberties() == 1) {
             for (const auto& p : neighbor_string->stones()) {
-                hashcode ^= opponent_codes->at(p);
-                hashcode ^= zobrist::EMPTY_HASH_CODE.at(p);
+                hashcode ^= zobrist_.getStone(opponent, p);
+                hashcode ^= zobrist_.getEmpty(p);
             }
         }
     }
