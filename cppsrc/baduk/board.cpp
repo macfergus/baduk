@@ -45,11 +45,11 @@ bool contains(Container container, T elem) {
 
 void Board::place(Point point, Stone player) {
     assert(isEmpty(point));
-    std::vector<GoString*> adjacent_same_color;
-    std::vector<GoString*> adjacent_other_color;
+    std::vector<GoString const*> adjacent_same_color;
+    std::vector<GoString const*> adjacent_other_color;
     std::vector<Point> liberties;
     for (Point neighbor: neighbors_->get(point)) {
-        GoString* neighbor_string = grid_[index(neighbor)].get();
+        auto neighbor_string = grid_[index(neighbor)].get();
         if (neighbor_string == nullptr) {
             liberties.push_back(neighbor);
         } else if (neighbor_string->color() == player) {
@@ -62,12 +62,9 @@ void Board::place(Point point, Stone player) {
             }
         }
     }
-    auto new_string = std::make_unique<GoString>(player, point, liberties);
-    for (auto const& same_color_string : adjacent_same_color) {
-        new_string = std::make_unique<GoString>(
-            new_string->mergedWith(*same_color_string));
-    }
-    replace(*new_string);
+    auto new_string = std::make_shared<const GoString>(
+        player, point, liberties, adjacent_same_color);
+    replace(new_string);
 
     // Update hash code.
     hashcode_ ^= zobrist::EMPTY_HASH_CODE.at(point);
@@ -78,8 +75,9 @@ void Board::place(Point point, Stone player) {
     }
 
     for (auto const& other_color_string : adjacent_other_color) {
-        auto replacement_string = other_color_string->withoutLiberty(point);
-        if (replacement_string.numLiberties() == 0) {
+        auto replacement_string = std::make_shared<GoString>(
+            *other_color_string, point, false /* add liberties */);
+        if (replacement_string->numLiberties() == 0) {
             remove(other_color_string);
         } else {
             replace(replacement_string);
@@ -89,7 +87,7 @@ void Board::place(Point point, Stone player) {
 
 bool Board::willCapture(Point point, Stone player) const {
     for (Point neighbor : neighbors_->get(point)) {
-        GoString* neighbor_string = grid_[index(neighbor)].get();
+        const auto neighbor_string = grid_[index(neighbor)].get();
         if (neighbor_string == nullptr) {
             continue;
         }
@@ -106,7 +104,7 @@ bool Board::willCapture(Point point, Stone player) const {
 bool Board::willHaveNoLiberties(Point point, Stone player) const {
     // Does NOT check if it is a capture! Call willCapture first.
     for (Point neighbor : neighbors_->get(point)) {
-        GoString* neighbor_string = grid_[index(neighbor)].get();
+        const auto neighbor_string = grid_[index(neighbor)].get();
         if (neighbor_string == nullptr) {
             // This point will be a liberty.
             return false;
@@ -121,10 +119,9 @@ bool Board::willHaveNoLiberties(Point point, Stone player) const {
     return true;
 }
 
-void Board::replace(GoString const& new_string) {
-    auto p_new_string = std::make_shared<GoString>(new_string);
-    for (auto const& point : p_new_string->stones()) {
-        grid_[index(point)] = p_new_string;
+void Board::replace(std::shared_ptr<const GoString> new_string) {
+    for (auto const& point : new_string->stones()) {
+        grid_[index(point)] = new_string;
     }
 }
 
@@ -132,7 +129,7 @@ Stone Board::at(Point p) const {
     return grid_[index(p)]->color();
 }
 
-std::shared_ptr<GoString> Board::stringAt(Point p) const {
+std::shared_ptr<const GoString> Board::stringAt(Point p) const {
     return grid_[index(p)];
 }
 
@@ -160,7 +157,9 @@ void Board::remove(GoString const* old_string) {
             }
         }
         for (auto string_to_update : strings_to_update) {
-            replace(string_to_update->withLiberty(point));
+            replace(std::make_shared<GoString>(
+                *string_to_update, point, true /* add liberty */
+            ));
         }
 
         if (old_string->color() == Stone::black) {
@@ -227,7 +226,7 @@ zobrist::hashcode Board::hashAfter(Point point, Stone stone) const {
     hashcode ^= my_codes->at(point);
 
     for (Point neighbor : neighbors_->get(point)) {
-        GoString* neighbor_string = grid_[index(neighbor)].get();
+        const auto neighbor_string = grid_[index(neighbor)].get();
         if (neighbor_string == nullptr) {
             continue;
         }
@@ -269,6 +268,66 @@ std::ostream& operator<<(std::ostream& out, Board const& board) {
     out << "\n";
 
     return out;
+}
+
+GoString::GoString(
+        Stone c, Point p,
+        std::vector<Point> const& liberties,
+        std::vector<GoString const*> neighbors) :
+    color_(c) {
+    unsigned int stones_to_add = 0;
+    unsigned int libs_to_add = 0;
+    for (auto neighbor : neighbors) {
+        for (auto const& new_point : neighbor->stones()) {
+            assert(!contains(stones_, new_point));
+        }
+        stones_to_add += neighbor->stones_.size();
+        libs_to_add += neighbor->liberties_.size();
+    }
+    stones_.reserve(1 + stones_to_add);
+    liberties_.reserve(liberties.size() + libs_to_add);
+
+    stones_.push_back(p);
+    liberties_.insert(liberties_.end(), liberties.begin(), liberties.end());
+
+    for (auto neighbor : neighbors) {
+        stones_.insert(
+            stones_.end(),
+            neighbor->stones_.begin(), neighbor->stones_.end());
+    }
+    for (auto neighbor : neighbors) {
+        for (auto const& new_liberty : neighbor->liberties_) {
+            if (!contains(stones_, new_liberty) &&
+                    !contains(liberties_, new_liberty)) {
+                liberties_.push_back(new_liberty);
+            }
+        }
+    }
+}
+
+int gindex(Point const& p) {
+    return 25 * p.row() + p.col();
+}
+
+GoString::GoString(
+        GoString const& original,
+        Point const& liberty_to_change,
+        bool add_liberty) :
+    color_(original.color_),
+    stones_(original.stones_) {
+    liberties_.reserve(original.liberties_.size() + 1);
+
+    const auto remove_code = gindex(liberty_to_change);
+
+    for (const auto p : original.liberties_) {
+        if (gindex(p) != remove_code) {
+            liberties_.push_back(p);
+        }
+    }
+
+    if (add_liberty) {
+        liberties_.push_back(liberty_to_change);
+    }
 }
 
 GoString GoString::withoutLiberty(Point p) const {
