@@ -51,7 +51,8 @@ void Board::place(Point point, Stone player) {
     std::vector<GoString const*> adjacent_same_color;
     std::vector<GoString const*> adjacent_other_color;
     std::vector<Point> liberties;
-    for (Point neighbor: neighbors_->get(point)) {
+
+    for (Point neighbor : neighbors_->get(point)) {
         auto neighbor_string = grid_[index(neighbor)].get();
         if (neighbor_string == nullptr) {
             liberties.push_back(neighbor);

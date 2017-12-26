@@ -30,7 +30,7 @@ bool isResign(Move const& move);
 
 class GameState {
 public:
-    virtual Board board() const = 0;
+    virtual Board const& board() const = 0;
     virtual Stone nextPlayer() const = 0;
     virtual GameState const* prevState() const = 0;
     virtual std::shared_ptr<GameState> applyMove(Move const& move) const = 0;

@@ -32,7 +32,7 @@ cdef extern from "baduk/baduk.h" namespace "baduk":
 
         bool isEmpty(CPoint point) const
         CStone at(CPoint) const
-        shared_ptr[CGoString] stringAt(CPoint) const
+        shared_ptr[const CGoString] stringAt(CPoint) const
 
     cdef cppclass CPass "baduk::Pass":
         CPass()
@@ -111,13 +111,13 @@ cdef CMove c_move(move):
     return CMove(CPlay(c_point(move.point)))
 
 cdef class GoString:
-    cdef shared_ptr[CGoString] c_string
+    cdef shared_ptr[const CGoString] c_string
 
     @property
     def num_liberties(self):
         return deref(self.c_string).numLiberties()
 
-cdef wrap_gostring(shared_ptr[CGoString] the_string):
+cdef wrap_gostring(shared_ptr[const CGoString] the_string):
     result = GoString()
     result.c_string = the_string
     return result

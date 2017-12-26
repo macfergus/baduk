@@ -12,6 +12,8 @@ setup(
             "cppsrc/baduk/game.cpp",
             "cppsrc/baduk/neighbor.cpp",
             "cppsrc/baduk/point.cpp",
+            "cppsrc/baduk/zobrist/codes.cpp",
+            "cppsrc/baduk/zobrist/zobrist.cpp",
         ],
         language="c++",
         extra_compile_args=['-std=c++1z', '-I./cppsrc'],

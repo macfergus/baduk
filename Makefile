@@ -26,6 +26,7 @@ clean:
 	rm -f out/testrunner
 	rm -f $(APPS)
 	rm -f $(DEPDIR)/*.d
+	rm -rf build/
 
 -include $(DEPDIR)/*.d
 

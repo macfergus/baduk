@@ -53,7 +53,7 @@ public:
         previous_states_.insert(prev_state_->hash());
     }
 
-    Board board() const override { return board_; }
+    Board const& board() const override { return board_; }
     Stone nextPlayer() const override { return next_player_; }
     GameState const* prevState() const override { return prev_state_.get(); }
 
