@@ -8,6 +8,7 @@
 
 #include "neighbor.h"
 #include "point.h"
+#include "pointset.h"
 #include "zobrist/zobrist.h"
 
 namespace baduk {
@@ -16,7 +17,7 @@ class GoString {
 public:
     GoString(
             Stone c, Point p,
-            std::vector<Point> const& liberties,
+            PointSet const& liberties,
             std::vector<GoString const*> neighbors);
 
     GoString(
@@ -26,16 +27,16 @@ public:
 
     GoString(
         Stone c,
-        std::vector<Point> const& points,
-        std::vector<Point> const& liberties) :
+        PointSet const& points,
+        PointSet const& liberties) :
         color_(c),
         stones_(points),
         liberties_(liberties) {}
 
     Stone color() const { return color_; }
     auto numLiberties() const { return liberties_.size(); }
-    std::vector<Point> stones() const { return stones_; }
-    std::vector<Point> liberties() const { return liberties_; }
+    PointSet stones() const { return stones_; }
+    PointSet liberties() const { return liberties_; }
 
     GoString mergedWith(GoString const& other) const;
     GoString withLiberty(Point p) const;
@@ -43,8 +44,8 @@ public:
 
 public:
     const Stone color_;
-    std::vector<Point> stones_;
-    std::vector<Point> liberties_;
+    PointSet stones_;
+    PointSet liberties_;
 };
 
 class Board {

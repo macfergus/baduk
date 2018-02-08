@@ -12,6 +12,7 @@ setup(
             "cppsrc/baduk/game.cpp",
             "cppsrc/baduk/neighbor.cpp",
             "cppsrc/baduk/point.cpp",
+            "cppsrc/baduk/pointset.cpp",
             "cppsrc/baduk/zobrist/codes.cpp",
             "cppsrc/baduk/zobrist/zobrist.cpp",
         ],

@@ -50,12 +50,12 @@ void Board::place(Point point, Stone player) {
     assert(isEmpty(point));
     std::vector<GoString const*> adjacent_same_color;
     std::vector<GoString const*> adjacent_other_color;
-    std::vector<Point> liberties;
+    PointSet liberties;
 
     for (Point neighbor : neighbors_->get(point)) {
         auto neighbor_string = grid_[index(neighbor)].get();
         if (neighbor_string == nullptr) {
-            liberties.push_back(neighbor);
+            liberties.add(neighbor);
         } else if (neighbor_string->color() == player) {
             if (!contains(adjacent_same_color, neighbor_string)) {
                 adjacent_same_color.push_back(neighbor_string);
@@ -120,7 +120,7 @@ bool Board::willHaveNoLiberties(Point point, Stone player) const {
 }
 
 void Board::replace(std::shared_ptr<const GoString> new_string) {
-    for (auto const& point : new_string->stones()) {
+    for (auto point : new_string->stones()) {
         grid_[index(point)] = new_string;
     }
 }
@@ -263,36 +263,18 @@ std::ostream& operator<<(std::ostream& out, Board const& board) {
 
 GoString::GoString(
         Stone c, Point p,
-        std::vector<Point> const& liberties,
+        PointSet const& liberties,
         std::vector<GoString const*> neighbors) :
     color_(c) {
-    unsigned int stones_to_add = 0;
-    unsigned int libs_to_add = 0;
+    stones_.add(p);
+    liberties_.add(liberties);
     for (auto neighbor : neighbors) {
-        for (auto const& new_point : neighbor->stones()) {
-            assert(!contains(stones_, new_point));
-        }
-        stones_to_add += neighbor->stones_.size();
-        libs_to_add += neighbor->liberties_.size();
+        stones_.add(neighbor->stones());
+        liberties_.add(neighbor->liberties_);
     }
-    stones_.reserve(1 + stones_to_add);
-    liberties_.reserve(liberties.size() + libs_to_add);
-
-    stones_.push_back(p);
-    liberties_.insert(liberties_.end(), liberties.begin(), liberties.end());
-
+    liberties_.remove(p);
     for (auto neighbor : neighbors) {
-        stones_.insert(
-            stones_.end(),
-            neighbor->stones_.begin(), neighbor->stones_.end());
-    }
-    for (auto neighbor : neighbors) {
-        for (auto const& new_liberty : neighbor->liberties_) {
-            if (!contains(stones_, new_liberty) &&
-                    !contains(liberties_, new_liberty)) {
-                liberties_.push_back(new_liberty);
-            }
-        }
+        liberties_.remove(neighbor->stones());
     }
 }
 
@@ -305,58 +287,29 @@ GoString::GoString(
         Point const& liberty_to_change,
         bool add_liberty) :
     color_(original.color_),
-    stones_(original.stones_) {
-    liberties_.reserve(original.liberties_.size() + 1);
-
-    const auto remove_code = gindex(liberty_to_change);
-
-    for (const auto p : original.liberties_) {
-        if (gindex(p) != remove_code) {
-            liberties_.push_back(p);
-        }
-    }
+    stones_(original.stones_),
+    liberties_(original.liberties_) {
 
     if (add_liberty) {
-        liberties_.push_back(liberty_to_change);
+        liberties_.add(liberty_to_change);
+    } else {
+        liberties_.remove(liberty_to_change);
     }
 }
 
 GoString GoString::withoutLiberty(Point p) const {
-    std::vector<Point> new_liberties;
-    for (const auto old_point : liberties_) {
-        if (!(old_point == p)) {
-            new_liberties.push_back(old_point);
-        }
-    }
-    return GoString(color_, stones_, new_liberties);
+    return GoString(color_, stones_, liberties_.without(p));
 }
 
 GoString GoString::withLiberty(Point p) const {
-    std::vector<Point> new_liberties(liberties_);
-    new_liberties.push_back(p);
-    return GoString(color_, stones_, new_liberties);
+    return GoString(color_, stones_, liberties_.unionWith(p));
 }
 
 GoString GoString::mergedWith(GoString const& other) const {
-    std::vector<Point> new_stones(stones_);
-    std::vector<Point> new_liberties;
-    for (auto const& new_point : other.stones()) {
-        if (!contains(new_stones, new_point)) {
-            new_stones.push_back(new_point);
-        }
-    }
-    for (auto const& old_liberty : liberties_) {
-        if (!contains(new_stones, old_liberty)) {
-            new_liberties.push_back(old_liberty);
-        }
-    }
-    for (auto const& new_liberty : other.liberties_) {
-        if (!contains(new_stones, new_liberty) &&
-                !contains(new_liberties, new_liberty)) {
-            new_liberties.push_back(new_liberty);
-        }
-    }
-    return GoString(color_, new_stones, new_liberties);
+    auto new_liberties = liberties_.unionWith(other.liberties_);
+    new_liberties.remove(stones_);
+    new_liberties.remove(other.stones_);
+    return GoString(color_, stones_.unionWith(other.stones_), new_liberties);
 }
 
 }
