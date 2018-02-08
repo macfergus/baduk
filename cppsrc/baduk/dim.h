@@ -5,7 +5,7 @@ namespace baduk {
 
 // Set a global max board size because we pre-allocate some fixed-size
 // arrays.
-const unsigned int MAX_BOARD_SIZE = 25;
+const unsigned int MAX_BOARD_SIZE = 19;
 
 struct Dim {
     unsigned int width;
