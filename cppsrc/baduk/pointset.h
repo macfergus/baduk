@@ -9,8 +9,6 @@
 
 namespace baduk {
 
-const unsigned int MAX_POINTS = MAX_BOARD_SIZE * MAX_BOARD_SIZE;
-
 class PointIter;
 
 class PointSet {

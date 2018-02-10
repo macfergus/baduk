@@ -14,8 +14,7 @@ Board::Board() :
         num_rows_(19),
         num_cols_(19),
         neighbors_(getNeighborTable(19, 19)),
-        hashcode_(zobrist_.emptyBoard()),
-        grid_(19 * 19, nullptr) {
+        hashcode_(zobrist_.emptyBoard()) {
 }
 
 Board::Board(unsigned int num_rows, unsigned int num_cols) :
@@ -23,8 +22,7 @@ Board::Board(unsigned int num_rows, unsigned int num_cols) :
         num_rows_(num_rows),
         num_cols_(num_cols),
         neighbors_(getNeighborTable(num_rows, num_cols)),
-        hashcode_(zobrist_.emptyBoard()),
-        grid_(num_rows * num_cols, nullptr) {
+        hashcode_(zobrist_.emptyBoard()) {
 }
 
 Board::Board(Board const& b) :

@@ -1,6 +1,7 @@
 #ifndef incl_BADUK_BOARD_H__
 #define incl_BADUK_BOARD_H__
 
+#include <array>
 #include <memory>
 #include <ostream>
 #include <string>
@@ -84,7 +85,7 @@ private:
 
     zobrist::hashcode hashcode_;
 
-    std::vector<std::shared_ptr<const GoString>> grid_;
+    std::array<std::shared_ptr<const GoString>, MAX_POINTS> grid_;
 
     unsigned int index(Point p) const;
     void replace(std::shared_ptr<const GoString> new_string);
