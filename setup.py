@@ -10,6 +10,7 @@ setup(
             "cppsrc/baduk/agent.cpp",
             "cppsrc/baduk/board.cpp",
             "cppsrc/baduk/game.cpp",
+            "cppsrc/baduk/gostring.cpp",
             "cppsrc/baduk/neighbor.cpp",
             "cppsrc/baduk/point.cpp",
             "cppsrc/baduk/pointset.cpp",
