@@ -3,8 +3,11 @@
 #include <unordered_set>
 
 #include "game.h"
+#include "statichash.h"
 
 namespace baduk {
+
+const unsigned int HASH_SIZE = 1039;
 
 struct IsResignImpl {
     bool operator()(Play const&) { return false; }
@@ -125,9 +128,7 @@ public:
                         zobrist::BLACK_TO_PLAY;
                 const auto next_state_hash = next_board_hash ^ next_player_hash;
 
-                const auto prev_ptr = game_state->previous_states_.find(
-                    next_state_hash);
-                if (prev_ptr != game_state->previous_states_.end()) {
+                if (game_state->previous_states_.contains(next_state_hash)) {
                     return false;
                 }
             } else if (game_state->board_.willHaveNoLiberties(point, player)) {
@@ -157,7 +158,7 @@ private:
     Stone next_player_;
     std::optional<Move> last_move_;
     std::shared_ptr<const GameStateImpl> prev_state_;
-    std::unordered_set<zobrist::hashcode> previous_states_;
+    StaticHash<zobrist::hashcode, HASH_SIZE> previous_states_;
 };
 
 
