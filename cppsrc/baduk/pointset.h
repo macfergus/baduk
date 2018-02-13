@@ -13,6 +13,10 @@ class PointIter;
 
 class PointSet {
 public:
+    PointSet() :
+        min_(MAX_POINTS - 1),
+        max_(0) {}
+
     auto size() const { return points_.count(); }
 
     // These return a copy
@@ -25,6 +29,7 @@ public:
     void add(PointSet const&);
     void remove(Point const&);
     void remove(PointSet const&);
+    void clear();
 
     std::vector<Point> asPoints() const;
 
@@ -33,6 +38,8 @@ public:
 
 private:
     std::bitset<MAX_POINTS> points_;
+    unsigned int min_;
+    unsigned int max_;
 
     friend class PointIter;
 };

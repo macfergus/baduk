@@ -31,8 +31,8 @@ public:
         const auto string1 = board1.stringAt("A2");
         const auto string2 = board2.stringAt("A2");
 
-        TS_ASSERT_EQUALS(4, string1->numLiberties());
-        TS_ASSERT_EQUALS(3, string2->numLiberties());
+        TS_ASSERT_EQUALS(4, string1.numLiberties());
+        TS_ASSERT_EQUALS(3, string2.numLiberties());
     }
 
     void testCaptureIsNotSuicide() {
@@ -58,7 +58,7 @@ public:
         board.place("O15", baduk::Stone::white);
         board.place("P16", baduk::Stone::white);
         const auto string = board.stringAt("P16");
-        TS_ASSERT_EQUALS(1, string->numLiberties());
+        TS_ASSERT_EQUALS(1, string.numLiberties());
     }
 
     void testWillCapture() {

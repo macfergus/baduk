@@ -16,7 +16,7 @@ PointIter::PointIter(PointSet const& pointset, unsigned int i) :
 
 PointIter& PointIter::operator++() {
     ++i_;
-    while (i_ < MAX_POINTS && !pointset_.points_.test(i_)) {
+    while (i_ < MAX_POINTS && i_ <= pointset_.max_ && !pointset_.points_[i_]) {
         ++i_;
     }
     return *this;
@@ -31,11 +31,20 @@ bool PointIter::operator!=(PointIter const& p) const {
 }
 
 void PointSet::add(Point const& p) {
-    points_.set(index(p));
+    const auto pindex = index(p);
+    points_.set(pindex);
+    if (pindex < min_) {
+        min_ = pindex;
+    }
+    if (pindex > max_) {
+        max_ = pindex;
+    }
 }
 
 void PointSet::add(PointSet const& ps) {
     points_ |= ps.points_;
+    min_ = std::min(min_, ps.min_);
+    max_ = std::max(max_, ps.max_);
 }
 
 void PointSet::remove(Point const& p) {
@@ -44,6 +53,12 @@ void PointSet::remove(Point const& p) {
 
 void PointSet::remove(PointSet const& ps) {
     points_ &= (~ps.points_);
+}
+
+void PointSet::clear() {
+    points_.reset();
+    min_ = MAX_POINTS - 1;
+    max_ = 0;
 }
 
 PointSet PointSet::without(Point const& p) const {
@@ -65,13 +80,13 @@ PointSet PointSet::unionWith(PointSet const& ps) const {
 }
 
 PointIter PointSet::begin() const {
-    auto tmp = PointIter(*this, -1);
+    auto tmp = PointIter(*this, min_ - 1);
     ++tmp;
     return tmp;
 }
 
 PointIter PointSet::end() const {
-    return PointIter(*this, MAX_POINTS);
+    return PointIter(*this, max_ + 1);
 }
 
 }

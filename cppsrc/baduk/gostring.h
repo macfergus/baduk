@@ -8,6 +8,9 @@ namespace baduk {
 
 class GoString {
 public:
+    GoString() :
+        color_(Stone::black) {}
+
     GoString(
             Stone c, Point p,
             PointSet const& liberties,
@@ -31,12 +34,17 @@ public:
     PointSet stones() const { return stones_; }
     PointSet liberties() const { return liberties_; }
 
+    void clear();
+    void setColor(Stone);
+    void addPoint(Point p);
+    void addLiberty(Point p);
+    void removeLiberty(Point p);
+    void merge(GoString const& other);
+
     GoString mergedWith(GoString const& other) const;
-    GoString withLiberty(Point p) const;
-    GoString withoutLiberty(Point p) const;
 
 public:
-    const Stone color_;
+    Stone color_;
     PointSet stones_;
     PointSet liberties_;
 };

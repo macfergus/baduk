@@ -14,13 +14,13 @@
 
 namespace baduk {
 
+using StringIdx = int;
+const StringIdx EMPTY = -1;
+
 class Board {
 public:
     Board();
     Board(unsigned int num_rows, unsigned int num_cols);
-    Board(Board const& b);
-
-    Board& operator=(Board const &b);
 
     unsigned int numRows() const { return num_rows_; }
     unsigned int numCols() const { return num_cols_; }
@@ -30,7 +30,7 @@ public:
     bool willHaveNoLiberties(Point point, Stone stone) const;
     bool isEmpty(Point point) const;
     Stone at(Point point) const;
-    std::shared_ptr<const GoString> stringAt(Point point) const;
+    GoString stringAt(Point point) const;
 
     std::vector<Point> const& neighbors(Point p) const;
 
@@ -50,11 +50,16 @@ private:
 
     zobrist::hashcode hashcode_;
 
-    std::array<std::shared_ptr<const GoString>, MAX_POINTS> grid_;
+    std::array<StringIdx, MAX_POINTS> grid_;
+    std::array<GoString, MAX_STRINGS> strings_;
+    std::bitset<MAX_STRINGS> used_;
 
     unsigned int index(Point p) const;
-    void replace(std::shared_ptr<const GoString> new_string);
-    void remove(GoString const* old_string);
+    void replace(StringIdx new_string);
+    void remove(StringIdx old_string);
+
+    StringIdx getUnusedString();
+    void recycle(StringIdx);
 
     void validate() const;
 };

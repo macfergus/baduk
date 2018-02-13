@@ -34,12 +34,31 @@ GoString::GoString(
     }
 }
 
-GoString GoString::withoutLiberty(Point p) const {
-    return GoString(color_, stones_, liberties_.without(p));
+void GoString::clear() {
+    stones_.clear();
+    liberties_.clear();
 }
 
-GoString GoString::withLiberty(Point p) const {
-    return GoString(color_, stones_, liberties_.unionWith(p));
+void GoString::setColor(Stone color) {
+    color_ = color;
+}
+
+void GoString::addPoint(Point p) {
+    stones_.add(p);
+}
+
+void GoString::addLiberty(Point p) {
+    liberties_.add(p);
+}
+
+void GoString::removeLiberty(Point p) {
+    liberties_.remove(p);
+}
+
+void GoString::merge(GoString const& other) {
+    stones_.add(other.stones_);
+    liberties_.add(other.liberties_);
+    liberties_.remove(stones_);
 }
 
 GoString GoString::mergedWith(GoString const& other) const {
