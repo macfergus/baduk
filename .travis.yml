@@ -1,0 +1,18 @@
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-7
+      - cxxtest
+
+language: python
+python:
+  - "3.6"
+install:
+  - pip install -r requirements.txt
+  - make pymodule
+
+script:
+  - make test
+  - make pytest
