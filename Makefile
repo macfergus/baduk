@@ -1,9 +1,11 @@
 DEPDIR=deps
 
-CXX=g++-7
+PIP ?= pip
+PYTHON ?= python
+
 PEDANTIC_CFLAGS=-Wall -Wextra -Wold-style-cast -Werror -pedantic
-CXXFLAGS=-O3 -std=c++1z -g $(PEDANTIC_CFLAGS)
-TEST_CXXFLAGS=-std=c++1z -Werror -I/usr/local/include
+CXXFLAGS=-O3 -std=c++17 -g $(PEDANTIC_CFLAGS)
+TEST_CXXFLAGS=-std=c++17 -Werror -I/usr/local/include
 LDFLAGS=-L/usr/local/Cellar//gperftools/2.6.1/lib/ -lprofiler
 
 SRCS := $(shell find cppsrc/baduk -name '*.cpp')
@@ -52,10 +54,19 @@ cppsrc/apps/randomplay: $(OBJS) $(APP_OBJS)
 cppsrc/apps/demo: $(OBJS) $(APP_OBJS)
 	$(CXX) $(LDFLAGS) -o cppsrc/apps/demo $(OBJS) cppsrc/apps/demo.o
 
+.PHONY: install-prereqs
+install-prereqs:
+	$(PIP) install -r requirements.txt
+
 .PHONY: pymodule
 pymodule:
-	CC=g++-7 CXX=g++-7 python setup.py build_ext --inplace
+	$(PYTHON) setup.py build_ext --inplace
+	$(PYTHON) setup.py build_ext --inplace
 
 .PHONY: pytest
 pytest: pymodule
 	nosetests tests/
+
+.PHONY: wheel
+wheel: pymodule
+	$(PYTHON) setup.py bdist_wheel
