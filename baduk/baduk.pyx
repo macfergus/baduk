@@ -49,12 +49,16 @@ cdef extern from "baduk/baduk.h" namespace "baduk":
         CMove(CPass)
         CMove(CResign)
         CMove(CPlay)
+    bool isPass(CMove)
+    bool isResign(CMove)
+    CPoint getPoint(CMove)
 
     cdef cppclass CGameState "baduk::GameState":
         CBoard board() const
         CStone nextPlayer() const
         bool isMoveLegal(CMove) const
         bool isOver() const
+        CMove lastMove() const
 
         shared_ptr[const CGameState] applyMove(CMove) const
 
@@ -103,12 +107,28 @@ cdef class Move:
     def resign(cls):
         return Move(is_resign=True)
 
+    def __eq__(self, other):
+        if self.is_pass and other.is_pass:
+            return True
+        if self.is_resign and other.is_resign:
+            return True
+        if self.is_play and other.is_play:
+            return self.point == other.point
+        return False
+
 cdef CMove c_move(move):
     if move.is_pass:
         return CMove(CPass())
     if move.is_resign:
         return CMove(CResign())
     return CMove(CPlay(c_point(move.point)))
+
+cdef py_move(CMove c_move):
+    if isPass(c_move):
+        return Move.pass_turn()
+    if isResign(c_move):
+        return Move.resign()
+    return Move.play(py_point(getPoint(c_move)))
 
 cdef class GoString:
     cdef CGoString c_string
@@ -146,6 +166,9 @@ cdef py_player(CStone c_player):
 
 cdef CPoint c_point(Point point):
     return CPoint(point.row - 1, point.col - 1)
+
+cdef py_point(CPoint point):
+    return Point(point.row() + 1, point.col() + 1)
 
 cdef class Board:
     cdef unique_ptr[CBoard] c_board
@@ -221,6 +244,10 @@ cdef class GameState:
     @property
     def board(self):
         return copy_and_wrap_board(deref(self.c_gamestate).board())
+
+    @property
+    def last_move(self):
+        return py_move(deref(self.c_gamestate).lastMove())
 
     cpdef bool is_over(self):
         return deref(self.c_gamestate).isOver()

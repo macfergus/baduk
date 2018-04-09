@@ -10,7 +10,7 @@ script:
 matrix:
   include:
     - os: osx
-      osx_image: xcode9.3beta
+      osx_image: xcode9.2
       language: generic
       before_install: brew upgrade python ; rm -f /usr/local/include/c++ ; brew install gcc ; brew install cxxtest
       env:
@@ -19,7 +19,6 @@ matrix:
         artifacts:
           s3_region: "us-west-2"
           paths: $(ls dist/*.whl)
-
 
     - os: linux
       language: python

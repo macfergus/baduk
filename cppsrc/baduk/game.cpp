@@ -29,6 +29,10 @@ bool isResign(Move const& move) {
     return std::visit(IsResignImpl(), move);
 }
 
+Point getPoint(Move const& move) {
+    return std::get<Play>(move).point();
+}
+
 class GameStateImpl :
     public GameState,
     public std::enable_shared_from_this<GameStateImpl> {
@@ -59,6 +63,7 @@ public:
     Board const& board() const override { return board_; }
     Stone nextPlayer() const override { return next_player_; }
     GameState const* prevState() const override { return prev_state_.get(); }
+    Move lastMove() const override { return last_move_.value(); }
 
     zobrist::hashcode hash() const {
         const auto player_hash = next_player_ == Stone::black ?

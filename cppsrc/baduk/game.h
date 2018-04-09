@@ -27,6 +27,8 @@ class Resign {};
 using Move = std::variant<Play, Pass, Resign>;
 bool isPass(Move const& move);
 bool isResign(Move const& move);
+// Throws an exception if the Move is not a Play
+Point getPoint(Move const& move);
 
 class GameState {
 public:
@@ -36,6 +38,7 @@ public:
     virtual std::shared_ptr<GameState> applyMove(Move const& move) const = 0;
     virtual bool isMoveLegal(Move const& move) const = 0;
     virtual bool isOver() const = 0;
+    virtual Move lastMove() const = 0;
 
     virtual bool operator==(GameState const&) const = 0;
 

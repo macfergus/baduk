@@ -19,6 +19,12 @@ class GameTest(unittest.TestCase):
         self.assertTrue(state.is_valid_move(Move.play(Point(16, 17))))
         self.assertFalse(state.is_valid_move(Move.play(Point(16, 16))))
 
+    def test_last_move(self):
+        start = GameState.new_game(19)
+        next_move = Move.play(Point(16, 16))
+        state = start.apply_move(next_move)
+
+        self.assertEqual(Move.play(Point(16, 16)), state.last_move)
 
 
 if __name__ == '__main__':
