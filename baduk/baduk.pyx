@@ -57,6 +57,7 @@ cdef extern from "baduk/baduk.h" namespace "baduk":
         CBoard board() const
         CStone nextPlayer() const
         bool isMoveLegal(CMove) const
+        bool doesMoveViolateKo(CMove) const
         bool isOver() const
         CMove lastMove() const
 
@@ -257,6 +258,9 @@ cdef class GameState:
 
     cpdef bool is_valid_move(self, Move move):
         return deref(self.c_gamestate).isMoveLegal(c_move(move))
+
+    cpdef bool does_move_violate_ko(self, Move move):
+        return deref(self.c_gamestate).doesMoveViolateKo(c_move(move))
 
     cpdef legal_plays(self):
         moves = []

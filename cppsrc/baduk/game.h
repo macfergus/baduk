@@ -37,6 +37,7 @@ public:
     virtual GameState const* prevState() const = 0;
     virtual std::shared_ptr<GameState> applyMove(Move const& move) const = 0;
     virtual bool isMoveLegal(Move const& move) const = 0;
+    virtual bool doesMoveViolateKo(Move const& move) const = 0;
     virtual bool isOver() const = 0;
     virtual Move lastMove() const = 0;
 

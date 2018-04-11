@@ -123,17 +123,7 @@ public:
 
             // Ko.
             if (game_state->board_.willCapture(point, player)) {
-                // Find the hash of the next state, without actually computing
-                // the full board position.
-                const auto next_board_hash =
-                    game_state->board_.hashAfter(point, player);
-                const auto next_player_hash =
-                    game_state->next_player_ == Stone::black ?
-                        zobrist::WHITE_TO_PLAY :
-                        zobrist::BLACK_TO_PLAY;
-                const auto next_state_hash = next_board_hash ^ next_player_hash;
-
-                if (game_state->previous_states_.contains(next_state_hash)) {
+                if (game_state->willViolateKo(point)) {
                     return false;
                 }
             } else if (game_state->board_.willHaveNoLiberties(point, player)) {
@@ -158,12 +148,56 @@ public:
         return std::visit(CheckLegal(this), move);
     }
 
+    struct CheckViolatesKo {
+        GameStateImpl const* game_state;
+
+        CheckViolatesKo(GameStateImpl const* parent) : game_state(parent) {}
+
+        bool operator()(Play const& play) {
+            const auto point = play.point();
+            const auto player = game_state->next_player_;
+            if (!game_state->board_.isEmpty(point)) {
+                return false;
+            }
+
+            if (game_state->board_.willCapture(point, player)) {
+                return game_state->willViolateKo(point);
+            }
+            return false;
+        }
+
+        bool operator()(Pass const&) {
+            return false;
+        }
+
+        bool operator()(Resign const&) {
+            return false;
+        }
+    };
+
+    bool doesMoveViolateKo(Move const& move) const override {
+        return std::visit(CheckViolatesKo(this), move);
+    }
+
 private:
     Board board_;
     Stone next_player_;
     std::optional<Move> last_move_;
     std::shared_ptr<const GameStateImpl> prev_state_;
     StaticHash<zobrist::hashcode, HASH_SIZE> previous_states_;
+
+    bool willViolateKo(Point point) const {
+        // Find the hash of the next state, without actually computing
+        // the full board position.
+        const auto next_board_hash = board_.hashAfter(point, next_player_);
+        const auto next_player_hash =
+            next_player_ == Stone::black ?
+                zobrist::WHITE_TO_PLAY :
+                zobrist::BLACK_TO_PLAY;
+        const auto next_state_hash = next_board_hash ^ next_player_hash;
+
+        return previous_states_.contains(next_state_hash);
+    }
 };
 
 
