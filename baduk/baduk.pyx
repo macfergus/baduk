@@ -116,6 +116,9 @@ cdef class Move:
             return self.point == other.point
         return False
 
+    def __hash__(self):
+        return hash((self.is_pass, self.is_resign, self.is_play, self.point))
+
 cdef CMove c_move(move):
     if move.is_pass:
         return CMove(CPass())

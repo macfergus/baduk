@@ -26,6 +26,15 @@ class GameTest(unittest.TestCase):
 
         self.assertEqual(Move.play(Point(16, 16)), state.last_move)
 
+    def test_move_is_hashable(self):
+        moves = {
+            Move.play(Point(1, 1)): 1,
+            Move.resign(): 2,
+        }
+
+        self.assertEqual(1, moves[Move.play(Point(1, 1))])
+        self.assertEqual(2, moves[Move.resign()])
+
 
 if __name__ == '__main__':
     unittest.main()
