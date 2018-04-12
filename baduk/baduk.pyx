@@ -138,6 +138,10 @@ cdef class GoString:
     cdef CGoString c_string
 
     @property
+    def color(self):
+        return py_player(self.c_string.color())
+
+    @property
     def num_liberties(self):
         return self.c_string.numLiberties()
 

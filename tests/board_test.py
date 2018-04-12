@@ -34,9 +34,11 @@ class BoardTest(unittest.TestCase):
         board.place_stone(Player.white, Point(3, 2))
 
         black_string = board.get_string(Point(1, 1))
+        self.assertEqual(Player.black, black_string.color)
         self.assertEqual(1, black_string.num_liberties)
 
         white_string = board.get_string(Point(3, 2))
+        self.assertEqual(Player.white, white_string.color)
         self.assertEqual(4, white_string.num_liberties)
 
     def test_capture(self):
