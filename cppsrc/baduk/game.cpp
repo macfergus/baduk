@@ -210,4 +210,12 @@ std::shared_ptr<const GameState> newGame(unsigned int board_size) {
     );
 }
 
+std::shared_ptr<const GameState> gameFromBoard(Board board, Stone next_player) {
+    return std::shared_ptr<const GameState>(
+        std::make_shared<const GameStateImpl>(
+            board, next_player
+        )
+    );
+}
+
 }

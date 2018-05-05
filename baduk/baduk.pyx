@@ -64,6 +64,7 @@ cdef extern from "baduk/baduk.h" namespace "baduk":
         shared_ptr[const CGameState] applyMove(CMove) const
 
     shared_ptr[const CGameState] newGame(unsigned int)
+    shared_ptr[const CGameState] gameFromBoard(CBoard, CStone)
 
 cdef extern from "baduk/baduk.h" namespace "baduk::Stone":
     cdef CStone CBlackStone "baduk::Stone::black"
@@ -221,6 +222,13 @@ cdef create_game(unsigned int board_size):
     new_gs.c_gamestate = newGame(board_size)
     return new_gs
 
+cdef create_game_from_board(Board board, next_player):
+    new_gs = GameState()
+    new_gs.c_gamestate = gameFromBoard(
+        deref(board.c_board),
+        c_player(next_player))
+    return new_gs
+
 cdef wrap_gamestate(shared_ptr[const CGameState] gamestate):
     new_gs = GameState()
     new_gs.c_gamestate = gamestate
@@ -248,6 +256,10 @@ cdef class GameState:
     @classmethod
     def new_game(cls, board_size):
         return create_game(board_size)
+
+    @classmethod
+    def from_board(cls, board, next_player):
+        return create_game_from_board(board, next_player)
 
     @property
     def board(self):

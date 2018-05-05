@@ -47,6 +47,7 @@ public:
 };
 
 std::shared_ptr<const GameState> newGame(unsigned int board_size);
+std::shared_ptr<const GameState> gameFromBoard(Board board, Stone next_player);
 
 }
 

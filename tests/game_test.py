@@ -1,6 +1,6 @@
 import unittest
 
-from baduk import GameState, Move, Player, Point
+from baduk import Board, GameState, Move, Player, Point
 
 
 class GameTest(unittest.TestCase):
@@ -63,6 +63,15 @@ class GameTest(unittest.TestCase):
         self.assertFalse(game.does_move_violate_ko(Move.play(Point(2, 2))))
         self.assertTrue(game.is_valid_move(Move.play(Point(2, 2))))
 
+    def test_create_game_from_board(self):
+        board = Board(5, 5)
+        board.place_stone(Player.black, Point(2, 2))
+        board.place_stone(Player.black, Point(4, 4))
+        game = GameState.from_board(board, Player.white)
+
+        self.assertEqual(Player.white, game.next_player)
+        self.assertFalse(game.is_valid_move(Move.play(Point(2, 2))))
+        self.assertTrue(game.is_valid_move(Move.play(Point(3, 3))))
 
 
 if __name__ == '__main__':
