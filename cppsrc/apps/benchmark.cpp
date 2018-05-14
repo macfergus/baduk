@@ -4,7 +4,7 @@
 
 int main() {
     for (int i = 0; i < 10000; ++i) {
-        auto game = baduk::newGame(9);
+        auto game = baduk::newGame(9, 7.5);
         baduk::RandomBot black_bot;
         baduk::RandomBot white_bot;
 

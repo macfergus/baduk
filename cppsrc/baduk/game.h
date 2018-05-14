@@ -40,14 +40,17 @@ public:
     virtual bool doesMoveViolateKo(Move const& move) const = 0;
     virtual bool isOver() const = 0;
     virtual Move lastMove() const = 0;
+    virtual float komi() const = 0;
 
     virtual bool operator==(GameState const&) const = 0;
 
     virtual zobrist::hashcode hash() const = 0;
 };
 
-std::shared_ptr<const GameState> newGame(unsigned int board_size);
-std::shared_ptr<const GameState> gameFromBoard(Board board, Stone next_player);
+std::shared_ptr<const GameState> newGame(unsigned int board_size, float komi);
+std::shared_ptr<const GameState> gameFromBoard(
+    Board board, Stone next_player,
+    float komi);
 
 }
 

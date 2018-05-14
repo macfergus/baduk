@@ -37,9 +37,10 @@ class GameStateImpl :
     public GameState,
     public std::enable_shared_from_this<GameStateImpl> {
 public:
-    GameStateImpl(Board const& board, Stone next_player) :
+    GameStateImpl(Board const& board, Stone next_player, float komi) :
         board_(board),
-        next_player_(next_player) {}
+        next_player_(next_player),
+        komi_(komi) {}
 
     GameStateImpl(
             Stone next_player,
@@ -48,7 +49,8 @@ public:
         board_(parent->board_),
         next_player_(next_player),
         last_move_(last_move),
-        prev_state_(parent) {
+        prev_state_(parent),
+        komi_(parent->komi()) {
 
         if (std::holds_alternative<Play>(last_move)) {
             board_.place(
@@ -64,6 +66,7 @@ public:
     Stone nextPlayer() const override { return next_player_; }
     GameState const* prevState() const override { return prev_state_.get(); }
     Move lastMove() const override { return last_move_.value(); }
+    float komi() const override { return komi_; }
 
     zobrist::hashcode hash() const {
         const auto player_hash = next_player_ == Stone::black ?
@@ -185,6 +188,7 @@ private:
     std::optional<Move> last_move_;
     std::shared_ptr<const GameStateImpl> prev_state_;
     StaticHash<zobrist::hashcode, HASH_SIZE> previous_states_;
+    float komi_;
 
     bool willViolateKo(Point point) const {
         // Find the hash of the next state, without actually computing
@@ -201,19 +205,21 @@ private:
 };
 
 
-std::shared_ptr<const GameState> newGame(unsigned int board_size) {
+std::shared_ptr<const GameState> newGame(unsigned int board_size, float komi) {
     return std::shared_ptr<const GameState>(
         std::make_shared<const GameStateImpl>(
             Board(board_size, board_size),
-            Stone::black
+            Stone::black,
+            komi
         )
     );
 }
 
-std::shared_ptr<const GameState> gameFromBoard(Board board, Stone next_player) {
+std::shared_ptr<const GameState> gameFromBoard(
+        Board board, Stone next_player, float komi) {
     return std::shared_ptr<const GameState>(
         std::make_shared<const GameStateImpl>(
-            board, next_player
+            board, next_player, komi
         )
     );
 }

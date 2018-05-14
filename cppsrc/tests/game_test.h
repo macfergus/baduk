@@ -5,7 +5,7 @@
 class GameTestSuite : public CxxTest::TestSuite {
 public:
     void testGameState() {
-        auto game = baduk::newGame(19);
+        auto game = baduk::newGame(19, 7.5);
         game = game->applyMove(baduk::Play("Q16"));
         const auto board = game->board();
         TS_ASSERT_EQUALS(baduk::Stone::black, board.at("Q16"));
@@ -13,7 +13,7 @@ public:
     }
 
     void testKo() {
-        auto game = baduk::newGame(19);
+        auto game = baduk::newGame(19, 7.5);
         game = game->applyMove(baduk::Play("Q16"));
         game = game->applyMove(baduk::Play("P16"));
         game = game->applyMove(baduk::Play("P17"));

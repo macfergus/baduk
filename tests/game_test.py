@@ -73,6 +73,11 @@ class GameTest(unittest.TestCase):
         self.assertFalse(game.is_valid_move(Move.play(Point(2, 2))))
         self.assertTrue(game.is_valid_move(Move.play(Point(3, 3))))
 
+    def test_komi(self):
+        start = GameState.new_game(19, 0.5)
+        next_state = start.apply_move(Move.play(Point(16, 16)))
+
+        self.assertAlmostEqual(0.5, next_state.komi())
 
 if __name__ == '__main__':
     unittest.main()

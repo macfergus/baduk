@@ -3,7 +3,7 @@
 #include "../baduk/baduk.h"
 
 int main() {
-    auto game = baduk::newGame(19);
+    auto game = baduk::newGame(19, 7.5);
     baduk::RandomBot black_bot;
     baduk::RandomBot white_bot;
 
