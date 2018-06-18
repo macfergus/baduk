@@ -65,6 +65,7 @@ public:
     Board const& board() const override { return board_; }
     Stone nextPlayer() const override { return next_player_; }
     GameState const* prevState() const override { return prev_state_.get(); }
+    bool hasLastMove() const override { return bool(last_move_); }
     Move lastMove() const override { return last_move_.value(); }
     float komi() const override { return komi_; }
 

@@ -39,6 +39,7 @@ public:
     virtual bool isMoveLegal(Move const& move) const = 0;
     virtual bool doesMoveViolateKo(Move const& move) const = 0;
     virtual bool isOver() const = 0;
+    virtual bool hasLastMove() const = 0;
     virtual Move lastMove() const = 0;
     virtual float komi() const = 0;
 

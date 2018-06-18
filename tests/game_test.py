@@ -26,6 +26,10 @@ class GameTest(unittest.TestCase):
 
         self.assertEqual(Move.play(Point(16, 16)), state.last_move)
 
+    def test_last_move_is_none(self):
+        start = GameState.new_game(19)
+        self.assertIsNone(start.last_move)
+
     def test_move_is_hashable(self):
         moves = {
             Move.play(Point(1, 1)): 1,

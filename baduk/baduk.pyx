@@ -59,6 +59,7 @@ cdef extern from "baduk/baduk.h" namespace "baduk":
         bool isMoveLegal(CMove) const
         bool doesMoveViolateKo(CMove) const
         bool isOver() const
+        bool hasLastMove() const
         CMove lastMove() const
         float komi() const
 
@@ -269,6 +270,8 @@ cdef class GameState:
 
     @property
     def last_move(self):
+        if not deref(self.c_gamestate).hasLastMove():
+            return None
         return py_move(deref(self.c_gamestate).lastMove())
 
     cpdef bool is_over(self):
