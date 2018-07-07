@@ -65,7 +65,7 @@ pymodule:
 
 .PHONY: pytest
 pytest: pymodule
-	nosetests tests/
+	$(PYTHON) -m unittest discover tests/ -p '*_test.py'
 
 .PHONY: wheel
 wheel: pymodule
