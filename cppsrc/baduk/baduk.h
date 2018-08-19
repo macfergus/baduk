@@ -4,5 +4,6 @@
 #include "agent.h"
 #include "board.h"
 #include "game.h"
+#include "scoring.h"
 
 #endif

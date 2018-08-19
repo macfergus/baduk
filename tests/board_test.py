@@ -13,6 +13,17 @@ class BoardTest(unittest.TestCase):
         self.assertIsNone(board.get(Point(2, 3)))
         self.assertEqual(Player.black, board.get(Point(3, 3)))
 
+    def test_equality(self):
+        board1 = Board(5, 5)
+        board2 = Board(5, 5)
+
+        board1.place_stone(Player.black, Point(3, 3))
+
+        self.assertNotEqual(board1, board2)
+
+        board2.place_stone(Player.black, Point(3, 3))
+        self.assertEqual(board1, board2)
+
     def test_corner_capture(self):
         board = Board(5, 5)
         board.place_stone(Player.black, Point(1, 1))

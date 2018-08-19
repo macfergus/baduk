@@ -34,6 +34,8 @@ cdef extern from "baduk/baduk.h" namespace "baduk":
         CStone at(CPoint) const
         CGoString stringAt(CPoint) const
 
+        bool operator==(CBoard) const
+
     cdef cppclass CPass "baduk::Pass":
         CPass()
 
@@ -67,6 +69,8 @@ cdef extern from "baduk/baduk.h" namespace "baduk":
 
     shared_ptr[const CGameState] newGame(unsigned int, float)
     shared_ptr[const CGameState] gameFromBoard(CBoard, CStone, float)
+
+    CBoard removeDeadStones(shared_ptr[const CGameState])
 
 cdef extern from "baduk/baduk.h" namespace "baduk::Stone":
     cdef CStone CBlackStone "baduk::Stone::black"
@@ -214,6 +218,9 @@ cdef class Board:
     def num_cols(self):
         return deref(self.c_board).numCols()
 
+    def __eq__(self, Board other):
+        return deref(self.c_board) == deref(other.c_board)
+
 cdef copy_and_wrap_board(CBoard board):
     pyboard = Board(1, 1)
     pyboard.c_board.reset(new CBoard(board))
@@ -306,3 +313,7 @@ cdef class GameState:
 
     cpdef komi(self):
         return deref(self.c_gamestate).komi()
+
+
+def remove_dead_stones(GameState game):
+    return copy_and_wrap_board(removeDeadStones(game.c_gamestate))

@@ -31,6 +31,16 @@ public:
         return row_ == q.row() && col_ == q.col();
     }
 
+    bool operator<(Point q) const {
+        if (row_ < q.row_) {
+            return true;
+        }
+        if (row_ > q.row_) {
+            return false;
+        }
+        return col_ < q.col_;
+    }
+
 private:
     unsigned int row_;
     unsigned int col_;
