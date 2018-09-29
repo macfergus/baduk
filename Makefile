@@ -12,7 +12,7 @@ SRCS := $(shell find cppsrc/baduk -name '*.cpp')
 APP_SRCS := $(shell find cppsrc/apps -name '*.cpp')
 OBJS := ${SRCS:.cpp=.o}
 APP_OBJS := ${APP_SRCS:.cpp=.o}
-APPS := cppsrc/apps/randomplay cppsrc/apps/demo cppsrc/apps/benchmark
+APPS := cppsrc/apps/randomplay cppsrc/apps/demo cppsrc/apps/benchmark cppsrc/apps/score_benchmark
 
 TESTDIR = cppsrc/tests
 
@@ -53,6 +53,9 @@ cppsrc/apps/randomplay: $(OBJS) $(APP_OBJS)
 
 cppsrc/apps/demo: $(OBJS) $(APP_OBJS)
 	$(CXX) $(LDFLAGS) -o cppsrc/apps/demo $(OBJS) cppsrc/apps/demo.o
+
+cppsrc/apps/score_benchmark: $(OBJS) $(APP_OBJS)
+	$(CXX) $(LDFLAGS) -o cppsrc/apps/score_benchmark $(OBJS) cppsrc/apps/score_benchmark.o
 
 .PHONY: install-prereqs
 install-prereqs:

@@ -1,6 +1,8 @@
 #ifndef incl_BADUK_ZOBRIST_ZOBRIST_H__
 #define incl_BADUK_ZOBRIST_ZOBRIST_H__
 
+#include <vector>
+
 #include "../point.h"
 
 namespace baduk {

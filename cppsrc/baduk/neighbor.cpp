@@ -5,7 +5,6 @@
 namespace baduk {
 
 NeighborTable::NeighborTable(unsigned int num_rows, unsigned int num_cols) :
-    num_rows_(num_rows),
     num_cols_(num_cols),
     neighbors_([num_rows, num_cols]() {
         std::vector<std::vector<Point>> table;

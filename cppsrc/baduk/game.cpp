@@ -62,6 +62,8 @@ public:
         previous_states_.insert(prev_state_->hash());
     }
 
+    ~GameStateImpl() override {}
+
     Board const& board() const override { return board_; }
     Stone nextPlayer() const override { return next_player_; }
     GameState const* prevState() const override { return prev_state_.get(); }
@@ -69,7 +71,7 @@ public:
     Move lastMove() const override { return last_move_.value(); }
     float komi() const override { return komi_; }
 
-    zobrist::hashcode hash() const {
+    zobrist::hashcode hash() const override {
         const auto player_hash = next_player_ == Stone::black ?
             zobrist::BLACK_TO_PLAY :
             zobrist::WHITE_TO_PLAY;

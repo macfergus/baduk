@@ -14,8 +14,8 @@ public:
     std::vector<Point> const& get(Point const& p) const;
 
 private:
-    unsigned int num_rows_;
     unsigned int num_cols_;
+
     std::vector<std::vector<Point>> neighbors_;
 };
 
