@@ -145,6 +145,13 @@ class GameTest(unittest.TestCase):
             else:
                 self.assertEqual(1, val, "{} should be legal".format(i))
 
+    def test_move_number(self):
+        start = GameState.new_game(19)
+        self.assertEqual(0, start.num_moves)
+        game = start.apply_move(Move.play(Point(1, 3)))
+        game = game.apply_move(Move.play(Point(1, 2)))
+        self.assertEqual(2, game.num_moves)
+        
 
 if __name__ == '__main__':
     unittest.main()

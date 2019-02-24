@@ -71,6 +71,7 @@ cdef extern from "baduk/baduk.h" namespace "baduk":
         bool hasLastMove() const
         CMove lastMove() const
         float komi() const
+        int numMoves() const
 
         shared_ptr[const CGameState] applyMove(CMove) const
 
@@ -329,6 +330,10 @@ cdef class GameState:
         if not deref(self.c_gamestate).hasLastMove():
             return None
         return py_move(deref(self.c_gamestate).lastMove())
+
+    @property
+    def num_moves(self):
+        return deref(self.c_gamestate).numMoves()
 
     cpdef bool is_over(self):
         return deref(self.c_gamestate).isOver()

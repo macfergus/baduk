@@ -40,7 +40,8 @@ public:
     GameStateImpl(Board const& board, Stone next_player, float komi) :
         board_(board),
         next_player_(next_player),
-        komi_(komi) {}
+        komi_(komi),
+        num_moves_(0) {}
 
     GameStateImpl(
             Stone next_player,
@@ -50,7 +51,8 @@ public:
         next_player_(next_player),
         last_move_(last_move),
         prev_state_(parent),
-        komi_(parent->komi()) {
+        komi_(parent->komi()),
+        num_moves_(parent->numMoves() + 1) {
 
         if (std::holds_alternative<Play>(last_move)) {
             board_.place(
@@ -70,6 +72,7 @@ public:
     bool hasLastMove() const override { return bool(last_move_); }
     Move lastMove() const override { return last_move_.value(); }
     float komi() const override { return komi_; }
+    int numMoves() const override { return num_moves_; }
 
     zobrist::hashcode hash() const override {
         const auto player_hash = next_player_ == Stone::black ?
@@ -192,6 +195,7 @@ private:
     std::shared_ptr<const GameStateImpl> prev_state_;
     StaticHash<zobrist::hashcode, HASH_SIZE> previous_states_;
     float komi_;
+    int num_moves_;
 
     bool willViolateKo(Point point) const {
         // Find the hash of the next state, without actually computing

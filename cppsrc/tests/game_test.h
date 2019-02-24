@@ -36,4 +36,13 @@ public:
         // White can take ko now
         TS_ASSERT(game->isMoveLegal(baduk::Play("P16")));
     }
+
+    void testNumMoves() {
+        auto game = baduk::newGame(19, 7.5);
+        TS_ASSERT_EQUALS(0, game->numMoves());
+        game = game->applyMove(baduk::Play("T1"));
+        TS_ASSERT_EQUALS(1, game->numMoves());
+        game = game->applyMove(baduk::Play("T2"));
+        TS_ASSERT_EQUALS(2, game->numMoves());
+    }
 };

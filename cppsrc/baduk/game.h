@@ -44,6 +44,7 @@ public:
     virtual bool hasLastMove() const = 0;
     virtual Move lastMove() const = 0;
     virtual float komi() const = 0;
+    virtual int numMoves() const = 0;
 
     virtual bool operator==(GameState const&) const = 0;
 
