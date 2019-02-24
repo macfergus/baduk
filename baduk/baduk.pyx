@@ -1,9 +1,16 @@
 import collections
 import enum
 
+import numpy as np
+
 from cython.operator cimport dereference as deref
 from libcpp cimport bool
 from libcpp.memory cimport shared_ptr, unique_ptr
+
+cimport numpy as np
+
+DTYPE = np.float64
+ctypedef np.float64_t DTYPE_t
 
 cdef extern from "baduk/baduk.h" namespace "baduk":
     cdef cppclass CPoint "baduk::Point":
@@ -197,6 +204,10 @@ cdef class Board:
     def place_stone(self, player, point):
         deref(self.c_board).place(c_point(point), c_player(player))
 
+    def is_empty(self, point):
+        cdef CPoint pt = c_point(point)
+        return deref(self.c_board).isEmpty(pt)
+
     def get(self, point):
         cdef CPoint pt = c_point(point)
         if deref(self.c_board).isEmpty(pt):
@@ -220,6 +231,44 @@ cdef class Board:
 
     def __eq__(self, Board other):
         return deref(self.c_board) == deref(other.c_board)
+
+    def black_stones_as_array(self):
+        cdef np.ndarray[DTYPE_t, ndim=2] x = \
+            np.zeros((self.num_rows, self.num_cols), dtype=DTYPE)
+        cdef unsigned int r = 0
+        cdef unsigned int c = 0
+        cdef unsigned int num_rows = self.num_rows
+        cdef unsigned int num_cols = self.num_cols
+        cdef CPoint p = CPoint(0, 0)
+        while r < num_rows:
+            c = 0
+            while c < num_cols:
+                p = CPoint(r, c)
+                if not deref(self.c_board).isEmpty(p):
+                    if deref(self.c_board).at(p) == CBlackStone:
+                        x[r, c] = 1
+                c += 1
+            r += 1
+        return x
+
+    def white_stones_as_array(self):
+        cdef np.ndarray[DTYPE_t, ndim=2] x = \
+            np.zeros((self.num_rows, self.num_cols), dtype=DTYPE)
+        cdef unsigned int r = 0
+        cdef unsigned int c = 0
+        cdef unsigned int num_rows = self.num_rows
+        cdef unsigned int num_cols = self.num_cols
+        cdef CPoint p = CPoint(0, 0)
+        while r < num_rows:
+            c = 0
+            while c < num_cols:
+                p = CPoint(r, c)
+                if not deref(self.c_board).isEmpty(p):
+                    if deref(self.c_board).at(p) == CWhiteStone:
+                        x[r, c] = 1
+                c += 1
+            r += 1
+        return x
 
 cdef copy_and_wrap_board(CBoard board):
     pyboard = Board(1, 1)
@@ -313,6 +362,48 @@ cdef class GameState:
 
     cpdef komi(self):
         return deref(self.c_gamestate).komi()
+
+    def ko_points_as_array(self):
+        cdef unsigned int num_rows = deref(self.c_gamestate).board().numRows()
+        cdef unsigned int num_cols = deref(self.c_gamestate).board().numCols()
+        cdef np.ndarray[DTYPE_t, ndim=2] x = \
+            np.zeros((num_rows, num_cols), dtype=DTYPE)
+        cdef unsigned int r = 0
+        cdef unsigned int c = 0
+        cdef CPoint p = CPoint(0, 0)
+        cdef CMove move = CMove(CPlay(p))
+        while r < num_rows:
+            c = 0
+            while c < num_cols:
+                p = CPoint(r, c)
+                move = CMove(CPlay(p))
+                if deref(self.c_gamestate).doesMoveViolateKo(move):
+                    x[r, c] = 1
+                c += 1
+            r += 1
+        return x
+
+    def legal_moves_as_array(self):
+        cdef unsigned int num_rows = deref(self.c_gamestate).board().numRows()
+        cdef unsigned int num_cols = deref(self.c_gamestate).board().numCols()
+        cdef unsigned int size = num_rows * num_cols + 1
+        cdef np.ndarray[DTYPE_t, ndim=1] x = np.zeros((size,), dtype=DTYPE)
+        cdef unsigned int r = 0
+        cdef unsigned int c = 0
+        cdef CPoint p = CPoint(0, 0)
+        cdef CMove move = CMove(CPlay(p))
+        while r < num_rows:
+            c = 0
+            while c < num_cols:
+                p = CPoint(r, c)
+                move = CMove(CPlay(p))
+                if deref(self.c_gamestate).isMoveLegal(move):
+                    x[num_cols * r + c] = 1
+                c += 1
+            r += 1
+        # Pass is always legal.
+        x[size - 1] = 1
+        return x
 
 
 def remove_dead_stones(GameState game):

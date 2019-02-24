@@ -1,5 +1,7 @@
 import unittest
 
+import numpy as np
+
 from baduk import Board, Player, Point
 
 class BoardTest(unittest.TestCase):
@@ -111,3 +113,25 @@ class BoardTest(unittest.TestCase):
 
         black_string = board.get_string(Point(1, 1))
         self.assertEqual(3, black_string.num_liberties)
+
+    def test_black_stones_array(self):
+        board = Board(5, 5)
+        board.place_stone(Player.black, Point(2, 1))
+        board.place_stone(Player.white, Point(3, 2))
+
+        black_array = board.black_stones_as_array()
+        self.assertEqual((5, 5), black_array.shape)
+        self.assertEqual(1, black_array[1, 0])
+        self.assertEqual(0, black_array[2, 1])
+        self.assertEqual(0, black_array[3, 3])
+
+    def test_white_stones_array(self):
+        board = Board(5, 5)
+        board.place_stone(Player.black, Point(2, 1))
+        board.place_stone(Player.white, Point(3, 2))
+
+        white_array = board.white_stones_as_array()
+        self.assertEqual((5, 5), white_array.shape)
+        self.assertEqual(1, white_array[2, 1])
+        self.assertEqual(0, white_array[1, 0])
+        self.assertEqual(0, white_array[3, 3])

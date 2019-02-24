@@ -1,8 +1,10 @@
+import numpy as np
 from setuptools import setup, Extension
 from Cython.Build import cythonize
 
 setup(
     name="baduk",
+    include_dirs = [np.get_include()],
     ext_modules=cythonize(Extension(
         "baduk",
         sources=[
@@ -21,5 +23,8 @@ setup(
         ],
         language="c++",
         extra_compile_args=['-std=c++1z', '-I./cppsrc'],
-    ))
+    )),
+    install_requires=[
+        'numpy',
+    ]
 )

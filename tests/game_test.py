@@ -83,5 +83,68 @@ class GameTest(unittest.TestCase):
 
         self.assertAlmostEqual(0.5, next_state.komi())
 
+    def test_ko_as_array(self):
+        start = GameState.new_game(19)
+        # .wb.
+        # wb.b
+        # .wb.
+        # ....
+        game = start.apply_move(Move.play(Point(1, 3)))
+        game = game.apply_move(Move.play(Point(1, 2)))
+        game = game.apply_move(Move.play(Point(2, 2)))
+        game = game.apply_move(Move.play(Point(2, 1)))
+        game = game.apply_move(Move.play(Point(3, 3)))
+        game = game.apply_move(Move.play(Point(3, 2)))
+        game = game.apply_move(Move.play(Point(2, 4)))
+
+        # W takes the ko
+        game = game.apply_move(Move.play(Point(2, 3)))
+
+        ko_array = game.ko_points_as_array()
+        self.assertEqual((19, 19), ko_array.shape)
+        self.assertEqual(1, ko_array[1, 1])
+        self.assertEqual(0, ko_array[2, 1])
+        self.assertEqual(0, ko_array[5, 5])
+
+    def test_legal_move_mask(self):
+        start = GameState.new_game(19)
+        # .wb.
+        # wb.b
+        # .wb.
+        # ....
+        game = start.apply_move(Move.play(Point(1, 3)))
+        game = game.apply_move(Move.play(Point(1, 2)))
+        game = game.apply_move(Move.play(Point(2, 2)))
+        game = game.apply_move(Move.play(Point(2, 1)))
+        game = game.apply_move(Move.play(Point(3, 3)))
+        game = game.apply_move(Move.play(Point(3, 2)))
+        game = game.apply_move(Move.play(Point(2, 4)))
+
+        # W takes the ko
+        game = game.apply_move(Move.play(Point(2, 3)))
+
+        legal_moves = game.legal_moves_as_array()
+        self.assertEqual((19 * 19 + 1,), legal_moves.shape)
+        illegal_indices = [
+            # Suicide
+            19 * 0 + 0,
+            # Stones here
+            19 * 0 + 2,
+            19 * 0 + 1,
+            19 * 1 + 0,
+            19 * 2 + 2,
+            19 * 2 + 1,
+            19 * 1 + 3,
+            19 * 1 + 2,
+            # ko
+            19 * 1 + 1,
+        ]
+        for i, val in enumerate(legal_moves):
+            if i in illegal_indices:
+                self.assertEqual(0, val, "{} should be illegal".format(i))
+            else:
+                self.assertEqual(1, val, "{} should be legal".format(i))
+
+
 if __name__ == '__main__':
     unittest.main()
