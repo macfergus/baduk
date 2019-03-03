@@ -6,7 +6,8 @@ PYTHON ?= python
 PEDANTIC_CFLAGS=-Wall -Wextra -Wold-style-cast -Werror -pedantic
 CXXFLAGS=-O3 -std=c++17 -g $(PEDANTIC_CFLAGS)
 TEST_CXXFLAGS=-std=c++17 -Werror -I/usr/local/include
-LDFLAGS=-L/usr/local/Cellar//gperftools/2.6.1/lib/ -lprofiler
+#LDFLAGS=-L/usr/local/Cellar//gperftools/2.6.1/lib/ -lprofiler
+LDFLAGS=
 
 SRCS := $(shell find cppsrc/baduk -name '*.cpp')
 APP_SRCS := $(shell find cppsrc/apps -name '*.cpp')
