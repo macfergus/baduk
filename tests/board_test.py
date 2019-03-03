@@ -135,3 +135,77 @@ class BoardTest(unittest.TestCase):
         self.assertEqual(1, white_array[2, 1])
         self.assertEqual(0, white_array[1, 0])
         self.assertEqual(0, white_array[3, 3])
+
+    def test_num_liberties_array(self):
+        # .....
+        # .x.o.
+        # .....
+        # xo...
+        # xox..
+        board = Board(5, 5)
+        board.place_stone(Player.black, Point(1, 1))
+        board.place_stone(Player.black, Point(2, 1))
+        board.place_stone(Player.black, Point(1, 3))
+        board.place_stone(Player.black, Point(4, 2))
+        board.place_stone(Player.white, Point(1, 2))
+        board.place_stone(Player.white, Point(2, 2))
+        board.place_stone(Player.white, Point(4, 4))
+        one_lib = board.stones_with_n_liberties_as_array(Player.black, 1)
+        # np array indexing is upside-down compared to usual board
+        # notation
+        np.testing.assert_array_equal(np.array([
+            [1, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+        ]), one_lib)
+        b_two_lib = board.stones_with_n_liberties_as_array(Player.black, 2)
+        np.testing.assert_array_equal(np.array([
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+        ]), b_two_lib)
+        w_two_lib = board.stones_with_n_liberties_as_array(Player.white, 2)
+        np.testing.assert_array_equal(np.array([
+            [0, 1, 0, 0, 0],
+            [0, 1, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+        ]), w_two_lib)
+
+    def test_min_liberties_array(self):
+        # .....
+        # .x.o.
+        # .....
+        # xo...
+        # xox..
+        board = Board(5, 5)
+        board.place_stone(Player.black, Point(1, 1))
+        board.place_stone(Player.black, Point(2, 1))
+        board.place_stone(Player.black, Point(1, 3))
+        board.place_stone(Player.black, Point(4, 2))
+        board.place_stone(Player.white, Point(1, 2))
+        board.place_stone(Player.white, Point(2, 2))
+        board.place_stone(Player.white, Point(4, 4))
+        two_lib = board.stones_with_min_liberties_as_array(Player.black, 2)
+        # np array indexing is upside-down compared to usual board
+        # notation
+        np.testing.assert_array_equal(np.array([
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 1, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+        ]), two_lib)
+        three_lib = board.stones_with_min_liberties_as_array(Player.white, 3)
+        np.testing.assert_array_equal(np.array([
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 1, 0],
+            [0, 0, 0, 0, 0],
+        ]), three_lib)

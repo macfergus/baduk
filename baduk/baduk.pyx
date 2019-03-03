@@ -271,6 +271,48 @@ cdef class Board:
             r += 1
         return x
 
+    def stones_with_n_liberties_as_array(self, color, num_libs):
+        cdef CStone player = c_player(color)
+        cdef np.ndarray[DTYPE_t, ndim=2] x = \
+            np.zeros((self.num_rows, self.num_cols), dtype=DTYPE)
+        cdef unsigned int r = 0
+        cdef unsigned int c = 0
+        cdef unsigned int num_rows = self.num_rows
+        cdef unsigned int num_cols = self.num_cols
+        cdef CPoint p = CPoint(0, 0)
+        while r < num_rows:
+            c = 0
+            while c < num_cols:
+                p = CPoint(r, c)
+                if not deref(self.c_board).isEmpty(p):
+                    if deref(self.c_board).stringAt(p).color() == player \
+                            and deref(self.c_board).stringAt(p).numLiberties() == num_libs:
+                        x[r, c] = 1
+                c += 1
+            r += 1
+        return x
+
+    def stones_with_min_liberties_as_array(self, color, min_libs):
+        cdef CStone player = c_player(color)
+        cdef np.ndarray[DTYPE_t, ndim=2] x = \
+            np.zeros((self.num_rows, self.num_cols), dtype=DTYPE)
+        cdef unsigned int r = 0
+        cdef unsigned int c = 0
+        cdef unsigned int num_rows = self.num_rows
+        cdef unsigned int num_cols = self.num_cols
+        cdef CPoint p = CPoint(0, 0)
+        while r < num_rows:
+            c = 0
+            while c < num_cols:
+                p = CPoint(r, c)
+                if not deref(self.c_board).isEmpty(p):
+                    if deref(self.c_board).stringAt(p).color() == player \
+                            and deref(self.c_board).stringAt(p).numLiberties() >= min_libs:
+                        x[r, c] = 1
+                c += 1
+            r += 1
+        return x
+
 cdef copy_and_wrap_board(CBoard board):
     pyboard = Board(1, 1)
     pyboard.c_board.reset(new CBoard(board))
