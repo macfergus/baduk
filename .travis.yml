@@ -10,11 +10,11 @@ script:
 matrix:
   include:
     - os: osx
-      osx_image: xcode9.2
+      osx_image: xcode10.2
       language: generic
-      before_install: brew upgrade python ; rm -f /usr/local/include/c++ ; brew install gcc ; brew install cxxtest
+      before_install: brew upgrade python ; brew install cxxtest
       env:
-        - CC=g++-8 CXX=g++-8 PIP=/usr/local/bin/pip3 PYTHON=/usr/local/bin/python3
+        - PIP=/usr/local/bin/pip3 PYTHON=/usr/local/bin/python3
       addons:
         artifacts:
           s3_region: "us-west-2"

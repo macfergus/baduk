@@ -3,6 +3,7 @@ import platform
 from setuptools import setup, Extension
 from Cython.Build import cythonize
 
+include_dirs = [np.get_include(), './cppsrc']
 extra_compile_args = []
 extra_link_args = []
 if platform.system() == 'Darwin':
@@ -10,10 +11,12 @@ if platform.system() == 'Darwin':
     # full C++17 library (specifically, std::variant)
     extra_compile_args.append('-mmacosx-version-min=10.14')
     extra_link_args.append('-mmacosx-version-min=10.14')
+for inc_dir in include_dirs:
+    extra_compile_args.append('-I' + inc_dir)
 
 setup(
     name="baduk",
-    include_dirs = [np.get_include(), './cppsrc'],
+    include_dirs=include_dirs,
     ext_modules=cythonize(Extension(
         "baduk",
         sources=[
