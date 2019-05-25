@@ -7,7 +7,7 @@
 
 namespace baduk {
 
-const unsigned int HASH_SIZE = 1039;
+const unsigned int HASH_SIZE = 1493;
 
 struct IsResignImpl {
     bool operator()(Play const&) { return false; }
