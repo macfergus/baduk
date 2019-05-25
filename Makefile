@@ -65,7 +65,6 @@ install-prereqs:
 .PHONY: pymodule
 pymodule:
 	$(PYTHON) setup.py build_ext --inplace
-	$(PYTHON) setup.py build_ext --inplace
 
 .PHONY: pytest
 pytest: pymodule

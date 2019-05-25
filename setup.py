@@ -1,10 +1,19 @@
 import numpy as np
+import platform
 from setuptools import setup, Extension
 from Cython.Build import cythonize
 
+extra_compile_args = []
+extra_link_args = []
+if platform.system() == 'Darwin':
+    # When building with clang, this is required in order to use the
+    # full C++17 library (specifically, std::variant)
+    extra_compile_args.append('-mmacosx-version-min=10.14')
+    extra_link_args.append('-mmacosx-version-min=10.14')
+
 setup(
     name="baduk",
-    include_dirs = [np.get_include()],
+    include_dirs = [np.get_include(), './cppsrc'],
     ext_modules=cythonize(Extension(
         "baduk",
         sources=[
@@ -22,7 +31,8 @@ setup(
             "cppsrc/baduk/zobrist/zobrist.cpp",
         ],
         language="c++",
-        extra_compile_args=['-std=c++1z', '-I./cppsrc'],
+        extra_compile_args=['-O3', '-std=c++17'] + extra_compile_args,
+        extra_link_args=extra_link_args,
     )),
     install_requires=[
         'numpy',
