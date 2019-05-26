@@ -71,6 +71,10 @@ pymodule:
 pytest: pymodule
 	$(PYTHON) -m unittest discover tests/ -p '*_test.py'
 
+.PHONY: sdist
+sdist: pymodule
+	$(PYTHON) setup.py sdist
+
 .PHONY: wheel
 wheel: pymodule
 	$(PYTHON) setup.py bdist_wheel
