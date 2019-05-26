@@ -2,6 +2,7 @@
 
 import collections
 import enum
+import sys
 
 import numpy as np
 
@@ -508,3 +509,31 @@ cdef class GameState:
 
 def remove_dead_stones(GameState game):
     return copy_and_wrap_board(removeDeadStones(game.c_gamestate))
+
+
+def print_board(Board board, outf=None):
+    """Print a board in human-readable format.
+
+    outf is an I/O stream that the output will be printed to.
+
+    If outf is not provided, will print to sys.stdout.
+    """
+    if outf is None:
+        outf = sys.stdout
+    # I is omitted intentionally
+    col_names = 'ABCDEFGHJKLMNOPQRSTUVWXYZ'
+    rows = []
+    for r in range(1, board.num_rows + 1):
+        row = []
+        for c in range(1, board.num_cols + 1):
+            stone = board.get(Point(r, c))
+            if stone is None:
+                row.append('.')
+            elif stone == Player.black:
+                row.append('x')
+            else:
+                row.append('o')
+        rows.append('{:2d} {}'.format(r, ''.join(row)))
+    for row_str in reversed(rows):
+        outf.write(row_str + '\n')
+    outf.write('   ' + col_names[:board.num_cols] + '\n')

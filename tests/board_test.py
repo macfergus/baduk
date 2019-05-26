@@ -1,8 +1,9 @@
+import io
 import unittest
 
 import numpy as np
 
-from baduk import Board, Player, Point
+from baduk import Board, Player, Point, print_board
 
 class BoardTest(unittest.TestCase):
     def test_place_stone(self):
@@ -243,3 +244,26 @@ class BoardTest(unittest.TestCase):
             [0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0],
         ]), two_lib)
+
+    def test_print_board(self):
+        board = Board(5, 5)
+        # .....
+        # .....
+        # .o...
+        # xo...
+        # xxo..
+        board.place_stone(Player.black, Point(1, 1))
+        board.place_stone(Player.black, Point(1, 2))
+        board.place_stone(Player.black, Point(2, 1))
+        board.place_stone(Player.white, Point(1, 3))
+        board.place_stone(Player.white, Point(2, 2))
+        board.place_stone(Player.white, Point(3, 2))
+        buf = io.StringIO()
+        print_board(board, outf=buf)
+        lines = buf.getvalue().split('\n')
+        self.assertEqual(lines[0].strip(), '5 .....')
+        self.assertEqual(lines[1].strip(), '4 .....')
+        self.assertEqual(lines[2].strip(), '3 .o...')
+        self.assertEqual(lines[3].strip(), '2 xo...')
+        self.assertEqual(lines[4].strip(), '1 xxo..')
+        self.assertEqual(lines[5].strip(), 'ABCDE')
