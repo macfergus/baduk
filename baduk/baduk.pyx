@@ -6,6 +6,7 @@ import enum
 import numpy as np
 
 from cython.operator cimport dereference as deref
+from cython.operator cimport preincrement as inc
 from libcpp cimport bool
 from libcpp.memory cimport shared_ptr, unique_ptr
 
@@ -25,9 +26,24 @@ cdef extern from "baduk/baduk.h" namespace "baduk":
     cdef cppclass CStone "baduk::Stone":
         bool operator==(CStone) const
 
+    cdef cppclass CPointIter "baduk::PointIter":
+        CPoint operator*() const
+        bool operator!=(CPointIter) const
+        bool operator++()
+
+    cdef cppclass CPointSet "baduk::PointSet":
+        CPointIter begin() const
+        CPointIter end() const
+
     cdef cppclass CGoString "baduk::GoString":
         CStone color() const
         size_t numLiberties() const
+        CPointSet liberties() const
+
+    cdef cppclass CStringIter "baduk::StringIter":
+        CGoString operator*() const
+        bool operator!=(CStringIter) const
+        bool operator++()
 
     cdef cppclass CBoard "baduk::Board":
         CBoard() except +
@@ -44,6 +60,9 @@ cdef extern from "baduk/baduk.h" namespace "baduk":
         CGoString stringAt(CPoint) const
 
         bool operator==(CBoard) const
+
+        CStringIter stringsBegin() const
+        CStringIter stringsEnd() const
 
     cdef cppclass CPass "baduk::Pass":
         CPass()
@@ -314,6 +333,38 @@ cdef class Board:
                 c += 1
             r += 1
         return x
+
+    def max_liberties_as_array(self, max_libs):
+        """Return an array that indicates liberties.
+
+        The array will include a 1 at every location that is a liberty
+        for any stone with at most max_libs liberties.
+
+        For example, max_liberties_as_array(1) will return any points
+        that would cause a capture.
+
+        max_liberties_as_array(2) will return any points that could
+        start a ladder (not all of them will be ladder points, but any
+        ladder point will be in that set).
+        """
+        cdef np.ndarray[DTYPE_t, ndim=2] x = \
+            np.zeros((self.num_rows, self.num_cols), dtype=DTYPE)
+        cdef CStringIter it = deref(self.c_board).stringsBegin()
+        cdef CStringIter end = deref(self.c_board).stringsEnd()
+        while it != end:
+            if deref(it).numLiberties() <= max_libs:
+                _add_liberties(x, deref(it).liberties())
+            inc(it)
+        return x
+
+
+cdef _add_liberties(np.ndarray[DTYPE_t, ndim=2] x, CPointSet libset):
+    cdef CPointIter it = libset.begin()
+    cdef CPointIter end = libset.end()
+    while it != end:
+        x[deref(it).row(), deref(it).col()] = 1
+        inc(it)
+
 
 cdef copy_and_wrap_board(CBoard board):
     pyboard = Board(1, 1)

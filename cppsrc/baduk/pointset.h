@@ -44,16 +44,17 @@ private:
     friend class PointIter;
 };
 
-class PointIter{
+class PointIter {
 public:
-    PointIter(PointSet const& pointset, unsigned int i);
+    PointIter() : pointset_(nullptr), i_(0) {}
+    PointIter(PointSet const* pointset, unsigned int i);
 
     bool operator!=(PointIter const& p) const;
     PointIter& operator++();
     Point operator*() const;
 
 private:
-    PointSet const& pointset_;
+    PointSet const* pointset_;
     unsigned int i_;
 };
 

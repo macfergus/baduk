@@ -17,6 +17,8 @@ namespace baduk {
 using StringIdx = int;
 const StringIdx EMPTY = -1;
 
+class StringIter;
+
 class Board {
 public:
     Board();
@@ -40,6 +42,10 @@ public:
     /** Compute what the hash would be, after placing this stone. */
     zobrist::hashcode hashAfter(Point point, Stone stone) const;
 
+    /** Iterate over all the strings on the board. */
+    StringIter stringsBegin() const;
+    StringIter stringsEnd() const;
+
 private:
     zobrist::ZobristCodes const& zobrist_;
 
@@ -62,9 +68,26 @@ private:
     void recycle(StringIdx);
 
     void validate() const;
+
+    friend class StringIter;
 };
 
 std::ostream& operator<<(std::ostream&, Board const&);
+
+class StringIter {
+public:
+    StringIter() : board_(nullptr), i_(0) {}
+    StringIter(Board const* board, unsigned int i);
+
+    GoString operator*() const;
+    GoString const* operator->() const;
+    StringIter& operator++();
+    bool operator!=(StringIter const&) const;
+
+private:
+    Board const* board_;
+    unsigned int i_;
+};
 
 }
 

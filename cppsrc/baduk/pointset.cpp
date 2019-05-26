@@ -10,13 +10,15 @@ Point point(unsigned int index) {
     return Point(index / MAX_BOARD_SIZE, index % MAX_BOARD_SIZE);
 }
 
-PointIter::PointIter(PointSet const& pointset, unsigned int i) :
+PointIter::PointIter(PointSet const* pointset, unsigned int i) :
     pointset_(pointset),
     i_(i) {}
 
 PointIter& PointIter::operator++() {
     ++i_;
-    while (i_ < MAX_POINTS && i_ <= pointset_.max_ && !pointset_.points_[i_]) {
+    while (i_ < MAX_POINTS &&
+            i_ <= pointset_->max_ &&
+            !pointset_->points_[i_]) {
         ++i_;
     }
     return *this;
@@ -80,13 +82,13 @@ PointSet PointSet::unionWith(PointSet const& ps) const {
 }
 
 PointIter PointSet::begin() const {
-    auto tmp = PointIter(*this, min_ - 1);
+    auto tmp = PointIter(this, min_ - 1);
     ++tmp;
     return tmp;
 }
 
 PointIter PointSet::end() const {
-    return PointIter(*this, max_ + 1);
+    return PointIter(this, max_ + 1);
 }
 
 }

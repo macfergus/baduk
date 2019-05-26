@@ -25,6 +25,7 @@ clean:
 	find cppsrc/baduk/ -name \*.o -delete
 	find $(TESTDIR) -name \*.o -delete
 	find cppsrc/apps/ -name \*.o -delete
+	rm -f baduk/baduk.cpp
 	rm -f $(TESTDIR)/tests.cpp
 	rm -f out/testrunner
 	rm -f $(APPS)

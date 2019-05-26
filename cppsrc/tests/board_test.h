@@ -138,4 +138,32 @@ public:
         board.place("C3", baduk::Stone::white);
         verifyHash(board, "D3", baduk::Stone::black);
     }
+
+    void testStringIteration() {
+        baduk::Board board(5, 5);
+        // .o...
+        // .o...
+        // ....o
+        // xx...
+        // .x...
+        board.place("A2", baduk::Stone::black);
+        board.place("B1", baduk::Stone::black);
+        board.place("B2", baduk::Stone::black);
+        board.place("E3", baduk::Stone::white);
+        board.place("B4", baduk::Stone::white);
+        board.place("B5", baduk::Stone::white);
+        int white_strings = 0;
+        int black_strings = 0;
+        auto it = board.stringsBegin();
+        while (it != board.stringsEnd()) {
+            if (it->color() == baduk::Stone::black) {
+                ++black_strings;
+            } else {
+                ++white_strings;
+            }
+            ++it;
+        }
+        TS_ASSERT_EQUALS(black_strings, 1);
+        TS_ASSERT_EQUALS(white_strings, 2);
+    }
 };

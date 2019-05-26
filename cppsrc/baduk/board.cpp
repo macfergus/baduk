@@ -275,4 +275,43 @@ void Board::recycle(StringIdx string_idx) {
     used_.reset(string_idx);
 }
 
+StringIter Board::stringsBegin() const {
+    // Find the first used string.
+    unsigned int first = 0;
+    for (; first < strings_.size(); ++first) {
+        if (used_[first]) {
+            break;
+        }
+    }
+    return StringIter(this, first);
+}
+
+StringIter Board::stringsEnd() const {
+    return StringIter(this, strings_.size());
+}
+
+StringIter::StringIter(Board const* board, unsigned int i) :
+    board_(board),
+    i_(i) {}
+
+StringIter& StringIter::operator++() {
+    ++i_;
+    while (i_ < board_->strings_.size() && !board_->used_[i_]) {
+        ++i_;
+    }
+    return *this;
+}
+
+GoString StringIter::operator*() const {
+    return board_->strings_[i_];
+}
+
+GoString const* StringIter::operator->() const {
+    return &board_->strings_[i_];
+}
+
+bool StringIter::operator!=(StringIter const& it) const {
+    return board_ != it.board_ || i_ != it.i_;
+}
+
 }
