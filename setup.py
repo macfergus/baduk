@@ -16,6 +16,7 @@ for inc_dir in include_dirs:
 
 setup(
     name="baduk",
+    version="0.1.0",
     include_dirs=include_dirs,
     ext_modules=cythonize(Extension(
         "baduk",
