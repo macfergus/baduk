@@ -35,4 +35,6 @@ matrix:
             - cxxtest
         artifacts:
           s3_region: "us-west-2"
-          paths: $(ls dist/*.whl dist/*.tar.gz)
+          paths:
+           - $(ls dist/*.whl)
+           - $(ls dist/*.tar.gz)
