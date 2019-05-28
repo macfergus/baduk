@@ -55,4 +55,4 @@ Player.white
     - `white_stone_as_array`
     - `stones_with_n_liberties_as_array`
     - `stones_with_min_liberties_as_array`
-    - `max_liberties_as_array`
+    - `liberties_as_array`

@@ -234,16 +234,25 @@ class BoardTest(unittest.TestCase):
         board.place_stone(Player.white, Point(2, 2))
         board.place_stone(Player.white, Point(4, 4))
 
-        two_lib = board.max_liberties_as_array(2)
+        b_one_lib = board.liberties_as_array(Player.black, 1)
         # np array indexing is upside-down compared to usual board
         # notation
         np.testing.assert_array_equal(np.array([
-            [0, 0, 0, 1, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+        ]), b_one_lib)
+
+        w_two_lib = board.liberties_as_array(Player.white, 2)
+        np.testing.assert_array_equal(np.array([
+            [0, 0, 0, 0, 0],
             [0, 0, 1, 0, 0],
-            [1, 1, 0, 0, 0],
+            [0, 1, 0, 0, 0],
             [0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0],
-        ]), two_lib)
+        ]), w_two_lib)
 
     def test_print_board(self):
         board = Board(5, 5)

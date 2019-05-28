@@ -335,25 +335,19 @@ cdef class Board:
             r += 1
         return x
 
-    def max_liberties_as_array(self, max_libs):
+    def liberties_as_array(self, color, num_libs):
         """Return an array that indicates liberties.
 
         The array will include a 1 at every location that is a liberty
-        for any stone with at most max_libs liberties.
-
-        For example, max_liberties_as_array(1) will return any points
-        that would cause a capture.
-
-        max_liberties_as_array(2) will return any points that could
-        start a ladder (not all of them will be ladder points, but any
-        ladder point will be in that set).
+        for a stone with exactly num_libs liberties.
         """
+        cdef CStone player = c_player(color)
         cdef np.ndarray[DTYPE_t, ndim=2] x = \
             np.zeros((self.num_rows, self.num_cols), dtype=DTYPE)
         cdef CStringIter it = deref(self.c_board).stringsBegin()
         cdef CStringIter end = deref(self.c_board).stringsEnd()
         while it != end:
-            if deref(it).numLiberties() <= max_libs:
+            if deref(it).color() == player and deref(it).numLiberties() == num_libs:
                 _add_liberties(x, deref(it).liberties())
             inc(it)
         return x
