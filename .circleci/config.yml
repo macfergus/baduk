@@ -7,4 +7,8 @@ jobs:
       - image: cimg/python:3.9
     steps:
       - checkout
-      - run: g++ --version
+      - run: make install-prereqs
+      - run: make test
+      - run: make pytest
+      - run: make pymodule
+      - run: make sdist
