@@ -7,7 +7,8 @@ jobs:
       - image: cimg/python:3.9
     steps:
       - checkout
-      - run: sudo apt-get install cxxtest
+      - run: sudo apt-get update
+      - run: sudo apt-get install -y install cxxtest
       - run: make install-prereqs
       - run: make test
       - run: make pytest
