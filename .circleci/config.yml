@@ -14,3 +14,4 @@ jobs:
       - run: make pytest
       - run: make pymodule
       - run: make sdist
+      - run: make wheel
