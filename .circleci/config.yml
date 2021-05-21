@@ -15,3 +15,5 @@ jobs:
       - run: make pymodule
       - run: make sdist
       - run: make wheel
+      - store_artifacts:
+          path: dist
