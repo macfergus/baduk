@@ -2,7 +2,6 @@
 
 Fast baduk (go, weiqi) game logic for Python.
 
-# Template:
 [![macfergus](https://circleci.com/gh/macfergus/baduk.svg?style=svg)](https://circleci.com/gh/macfergus/baduk)
 
 ## Quick example
