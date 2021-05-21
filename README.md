@@ -2,7 +2,8 @@
 
 Fast baduk (go, weiqi) game logic for Python.
 
-[![Build Status](https://travis-ci.org/macfergus/baduk.svg?branch=master)](https://travis-ci.org/macfergus/baduk)
+# Template:
+[![macfergus](https://circleci.com/gh/macfergus/baduk.svg?style=svg)](https://circleci.com/gh/macfergus/baduk)
 
 ## Quick example
 
