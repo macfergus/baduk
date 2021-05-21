@@ -11,9 +11,28 @@ executors:
     docker:
       - image: cimg/python:<<parameters.python-version>>
 
-
 jobs:
-  build_test:
+  build_wheel:
+    parameters:
+      python-version:
+        description: "python version"
+        default: "3.9"
+        type: string
+    executor:
+      name: python-docker
+      python-version: <<parameters.python-version>>
+    steps:
+      - checkout
+      - run: sudo apt-get update
+      - run: sudo apt-get install -y cxxtest
+      - run: make install-prereqs
+      - run: make test
+      - run: make pytest
+      - run: make pymodule
+      - run: make wheel
+      - store_artifacts:
+          path: dist
+  build_sdist:
     parameters:
       python-version:
         description: "python version"
@@ -31,16 +50,18 @@ jobs:
       - run: make pytest
       - run: make pymodule
       - run: make sdist
-      - run: make wheel
       - store_artifacts:
           path: dist
 
 workflows:
   matrix-build:
     jobs:
-      - build_test:
+      - build_wheel:
           matrix:
             parameters:
               python-version:
                 - "3.9"
                 - "3.8"
+                - "3.7"
+                - "3.6"
+      - build_sdist
