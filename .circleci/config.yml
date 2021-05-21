@@ -39,8 +39,8 @@ workflows:
   matrix-build:
     jobs:
       - build_test:
-        matrix:
-          parameters:
-            python-version:
-              - 3.9
-              - 3.8
+          matrix:
+            parameters:
+              python-version:
+                - "3.9"
+                - "3.8"
